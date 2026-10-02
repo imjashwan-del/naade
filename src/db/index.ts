@@ -31,7 +31,15 @@ function createDatabase() {
 
   const pool =
     globalForDb.__arenaNextJsPostgresqlPool ??
-    new Pool({ connectionString: databaseUrl });
+    new Pool({
+      connectionString: databaseUrl,
+      ssl:
+        databaseUrl.includes("supabase") ||
+        databaseUrl.includes("neon") ||
+        databaseUrl.includes("sslmode")
+          ? { rejectUnauthorized: false }
+          : undefined,
+    });
 
   if (process.env.NODE_ENV !== "production") {
     globalForDb.__arenaNextJsPostgresqlPool = pool;

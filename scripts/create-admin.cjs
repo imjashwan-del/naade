@@ -58,7 +58,15 @@ async function createAdmin() {
     }
 
     const { Pool } = require("pg");
-    const pool = new Pool({ connectionString: DATABASE_URL });
+    const pool = new Pool({
+      connectionString: DATABASE_URL,
+      ssl:
+        DATABASE_URL.includes("supabase") ||
+        DATABASE_URL.includes("neon") ||
+        DATABASE_URL.includes("sslmode")
+          ? { rejectUnauthorized: false }
+          : undefined,
+    });
     try {
       await pool.query(
         `INSERT INTO admin_users (email, password_hash)
