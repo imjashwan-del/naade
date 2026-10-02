@@ -40,4 +40,20 @@ function createDatabase() {
   return drizzlePostgres(pool);
 }
 
-export const db = createDatabase();
+let _dbInstance: any = null;
+
+function getDb() {
+  if (!_dbInstance) {
+    _dbInstance = createDatabase();
+  }
+  return _dbInstance;
+}
+
+export const db: ReturnType<typeof createDatabase> = new Proxy({} as any, {
+  get(_target, prop, receiver) {
+    const instance = getDb();
+    const value = Reflect.get(instance, prop, receiver);
+    return typeof value === "function" ? value.bind(instance) : value;
+  },
+});
+
