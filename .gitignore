@@ -5,3 +5,6 @@
 .data/
 /public/uploads/
 node_modules
+.next/
+.vercel
+
