@@ -439,7 +439,7 @@ export const SITE_CONTENT_PAGES = [
         key: "phone",
         label: "Phone number",
         type: "text",
-        defaultValue: "+91 90000 00000",
+        defaultValue: "+91 8555909550",
       },
       {
         key: "studio",

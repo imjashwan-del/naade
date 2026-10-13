@@ -11,8 +11,9 @@ export const measurementsSchema = z.object({
 
 export const cartItemSchema = z.object({
   cartItemId: z.string(),
-  productId: z.number().int().positive(),
+  productId: z.number().int(),
   slug: z.string(),
+
   name: z.string().min(1),
   category: z.string(),
   price: z.number().positive(),

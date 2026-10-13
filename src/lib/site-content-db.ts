@@ -17,25 +17,36 @@ const defaults = Object.fromEntries(
 ) as Record<SiteContentPageId, SiteContentValues>;
 
 export async function getSiteContent(pageId: SiteContentPageId) {
-  const [saved] = await db
-    .select({ content: siteContent.content })
-    .from(siteContent)
-    .where(eq(siteContent.pageId, pageId))
-    .limit(1);
+  try {
+    const [saved] = await db
+      .select({ content: siteContent.content })
+      .from(siteContent)
+      .where(eq(siteContent.pageId, pageId))
+      .limit(1);
 
-  return { ...defaults[pageId], ...(saved?.content ?? {}) };
+    return { ...defaults[pageId], ...(saved?.content ?? {}) };
+  } catch (error) {
+    console.error(`Failed to load site content for ${pageId}:`, error);
+    return defaults[pageId];
+  }
 }
 
 export async function getAllSiteContent() {
-  const savedRows = await db.select().from(siteContent);
-  const savedContent = new Map(
-    savedRows.map((row) => [row.pageId, row.content]),
-  );
+  try {
+    const savedRows = await db.select().from(siteContent);
+    const savedContent = new Map(
+      savedRows.map((row) => [row.pageId, row.content]),
+    );
 
-  return Object.fromEntries(
-    SITE_CONTENT_PAGES.map((page) => [
-      page.id,
-      { ...defaults[page.id], ...(savedContent.get(page.id) ?? {}) },
-    ]),
-  ) as Record<SiteContentPageId, SiteContentValues>;
+    return Object.fromEntries(
+      SITE_CONTENT_PAGES.map((page) => [
+        page.id,
+        { ...defaults[page.id], ...(savedContent.get(page.id) ?? {}) },
+      ]),
+    ) as Record<SiteContentPageId, SiteContentValues>;
+  } catch (error) {
+    console.error("Failed to load all site content:", error);
+    return defaults;
+  }
 }
+

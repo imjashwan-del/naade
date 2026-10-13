@@ -64,9 +64,7 @@ export const orders = pgTable("orders", {
   trackingCarrier: text("tracking_carrier"),
   trackingNumber: text("tracking_number"),
   trackingUrl: text("tracking_url"),
-  razorpayOrderId: text("razorpay_order_id"),
-  razorpayPaymentId: text("razorpay_payment_id"),
-  razorpaySignature: text("razorpay_signature"),
+  phonePeTransactionId: text("phone_pe_transaction_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

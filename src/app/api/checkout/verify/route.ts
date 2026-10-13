@@ -1,31 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { db } from "@/db";
 import { orders, orderItems, products } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
-import { verifyRazorpaySignature } from "@/lib/razorpay";
+import { verifyPhonePePayment } from "@/lib/phonepe";
 
 export const dynamic = "force-dynamic";
 
-const verifySchema = z.object({
-  orderNumber: z.string(),
-  razorpayOrderId: z.string(),
-  razorpayPaymentId: z.string(),
-  razorpaySignature: z.string(),
-});
+/**
+ * GET /api/checkout/verify?orderNumber=NAADE-XXXX
+ *
+ * PhonePe redirects the user here after payment (success or failure).
+ * We verify the payment status server-side using the PhonePe Status API
+ * and then redirect the user to the appropriate confirmation or failure page.
+ */
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const orderNumber = searchParams.get("orderNumber");
 
-export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null);
-  const parsed = verifySchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Invalid verification payload" },
-      { status: 400 },
+  if (!orderNumber) {
+    return NextResponse.redirect(
+      new URL("/checkout?error=missing_order", req.url),
     );
   }
-
-  const { orderNumber, razorpayOrderId, razorpayPaymentId, razorpaySignature } =
-    parsed.data;
 
   const rows = await db
     .select()
@@ -33,102 +29,87 @@ export async function POST(req: NextRequest) {
     .where(eq(orders.orderNumber, orderNumber))
     .limit(1);
   const order = rows[0];
+
   if (!order) {
-    return NextResponse.json({ error: "Order not found" }, { status: 404 });
-  }
-
-  if (order.razorpayOrderId !== razorpayOrderId) {
-    return NextResponse.json(
-      { error: "Payment does not match this order" },
-      { status: 400 },
+    return NextResponse.redirect(
+      new URL("/checkout?error=order_not_found", req.url),
     );
   }
 
-  const isValid = verifyRazorpaySignature({
-    orderId: razorpayOrderId,
-    paymentId: razorpayPaymentId,
-    signature: razorpaySignature,
-  });
-
-  if (!isValid) {
-    return NextResponse.json(
-      { success: false, error: "Payment verification failed" },
-      { status: 400 },
-    );
-  }
-
+  // Already confirmed — idempotent redirect
   if (order.paymentStatus === "PAID") {
-    if (order.razorpayPaymentId === razorpayPaymentId) {
-      return NextResponse.json({ success: true, orderNumber });
+    return NextResponse.redirect(
+      new URL(`/order-confirmation/${orderNumber}`, req.url),
+    );
+  }
+
+  // Verify payment status with PhonePe server-side
+  try {
+    const statusResponse = await verifyPhonePePayment(order.orderNumber);
+
+    // V2: state is top-level — "COMPLETED" | "PENDING" | "FAILED" | "CANCELLED"
+    if (statusResponse.state !== "COMPLETED") {
+      return NextResponse.redirect(
+        new URL(`/checkout?error=payment_failed&order=${orderNumber}`, req.url),
+      );
     }
-    return NextResponse.json(
-      { error: "Order has already been paid" },
-      { status: 409 },
-    );
-  }
 
-  if (order.paymentStatus !== "PENDING") {
-    return NextResponse.json(
-      { error: "Order is not awaiting payment" },
-      { status: 409 },
-    );
-  }
+    const phonePeTransactionId =
+      statusResponse.paymentDetails?.[0]?.transactionId ??
+      statusResponse.orderId ??
+      order.orderNumber;
 
-  const updated = await db.transaction(async (tx) => {
-    const [paidOrder] = await tx
-      .update(orders)
-      .set({
-        paymentStatus: "PAID",
-        orderStatus: "CONFIRMED",
-        razorpayPaymentId,
-        razorpaySignature,
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(orders.id, order.id),
-          eq(orders.razorpayOrderId, razorpayOrderId),
-          eq(orders.paymentStatus, "PENDING"),
-        ),
-      )
-      .returning();
+    // Mark order as paid in a transaction and decrement inventory
+    const updated = await db.transaction(async (tx) => {
+      const [paidOrder] = await tx
+        .update(orders)
+        .set({
+          paymentStatus: "PAID",
+          orderStatus: "CONFIRMED",
+          phonePeTransactionId,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(orders.id, order.id),
+            eq(orders.paymentStatus, "PENDING"),
+          ),
+        )
+        .returning();
 
-    if (!paidOrder) return false;
+      if (!paidOrder) return false;
 
-    const items = await tx
-      .select()
-      .from(orderItems)
-      .where(eq(orderItems.orderId, order.id));
-    for (const item of items) {
-      if (item.productId) {
-        await tx
-          .update(products)
-          .set({
-            inventoryQuantity: sql`greatest(${products.inventoryQuantity} - ${item.quantity}, 0)`,
-          })
-          .where(eq(products.id, item.productId));
+      const items = await tx
+        .select()
+        .from(orderItems)
+        .where(eq(orderItems.orderId, order.id));
+      for (const item of items) {
+        if (item.productId) {
+          await tx
+            .update(products)
+            .set({
+              inventoryQuantity: sql`greatest(${products.inventoryQuantity} - ${item.quantity}, 0)`,
+            })
+            .where(eq(products.id, item.productId));
+        }
       }
-    }
-    return true;
-  });
+      return true;
+    });
 
-  if (!updated) {
-    const [latestOrder] = await db
-      .select()
-      .from(orders)
-      .where(eq(orders.id, order.id))
-      .limit(1);
-    if (
-      latestOrder?.paymentStatus === "PAID" &&
-      latestOrder.razorpayPaymentId === razorpayPaymentId
-    ) {
-      return NextResponse.json({ success: true, orderNumber });
+    if (!updated) {
+      // Race condition — another request already updated it
+      return NextResponse.redirect(
+        new URL(`/order-confirmation/${orderNumber}`, req.url),
+      );
     }
-    return NextResponse.json(
-      { error: "Order is not awaiting payment" },
-      { status: 409 },
+
+    return NextResponse.redirect(
+      new URL(`/order-confirmation/${orderNumber}`, req.url),
+    );
+  } catch (error) {
+    console.error("PhonePe verification error:", error);
+    return NextResponse.redirect(
+      new URL(`/checkout?error=verification_error&order=${orderNumber}`, req.url),
     );
   }
-
-  return NextResponse.json({ success: true, orderNumber });
 }

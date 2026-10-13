@@ -3,7 +3,10 @@ import { db } from "@/db";
 import { orders, orderItems, products } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
 import { createOrderSchema } from "@/lib/validation";
-import { getRazorpayClient, isRazorpayConfigured } from "@/lib/razorpay";
+import {
+  isPhonePeConfigured,
+  initiatePhonePePayment,
+} from "@/lib/phonepe";
 
 export const dynamic = "force-dynamic";
 
@@ -21,16 +24,23 @@ export async function POST(req: NextRequest) {
   const parsed = createOrderSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Invalid order details", issues: parsed.error.flatten() },
+      {
+        error: "Invalid order details",
+        issues: parsed.error.flatten(),
+        details: parsed.error.issues.map((issue) => ({
+          path: issue.path.join("."),
+          message: issue.message,
+        })),
+      },
       { status: 400 },
     );
   }
 
-  if (!isRazorpayConfigured()) {
+  if (!isPhonePeConfigured()) {
     return NextResponse.json(
       {
         error:
-          "Online payment is not configured. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to .env.local to accept prepaid orders.",
+          "Online payment is not configured. Add PHONEPE_CLIENT_ID, PHONEPE_CLIENT_SECRET, and PHONEPE_CLIENT_VERSION to .env.local to accept prepaid orders.",
       },
       { status: 503 },
     );
@@ -140,43 +150,44 @@ export async function POST(req: NextRequest) {
     })),
   );
 
+  // Build the callback URL PhonePe will redirect the user back to after payment
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const redirectUrl = `${siteUrl}/api/checkout/verify?orderNumber=${orderNumber}`;
+
   try {
-    const razorpay = getRazorpayClient();
-    const razorpayOrder = await razorpay.orders.create({
+    const phonepeResponse = await initiatePhonePePayment({
+      merchantOrderId: order.orderNumber,
       amount: totalInPaise,
-      currency: "INR",
-      receipt: order.orderNumber,
+      redirectUrl,
+      mobileNumber: customer.phone,
     });
+
+    // V2 response: { orderId, state, redirectUrl, ... }
+    if (!phonepeResponse.redirectUrl) {
+      throw new Error(
+        phonepeResponse.message ??
+          `PhonePe did not return a redirect URL (state: ${phonepeResponse.state})`,
+      );
+    }
+
+    const phonePeTransactionId = phonepeResponse.orderId ?? order.orderNumber;
 
     await db
       .update(orders)
-      .set({ razorpayOrderId: razorpayOrder.id, updatedAt: new Date() })
+      .set({ phonePeTransactionId, updatedAt: new Date() })
       .where(eq(orders.id, order.id));
 
     return NextResponse.json({
       configured: true,
       orderNumber: order.orderNumber,
-      razorpayOrderId: razorpayOrder.id,
-      amount: razorpayOrder.amount,
-      currency: razorpayOrder.currency,
-      keyId:
-        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID,
+      phonePeTransactionId,
+      redirectUrl: phonepeResponse.redirectUrl,
     });
   } catch (error) {
-    const status =
-      error && typeof error === "object" && "statusCode" in error
-        ? Number((error as { statusCode?: number }).statusCode)
-        : 0;
-
-    if (status === 401) {
-      return NextResponse.json(
-        { error: "Razorpay authentication failed." },
-        { status: 401 },
-      );
-    }
-
+    console.error("PhonePe initiation error:", error);
     return NextResponse.json(
-      { error: "Unable to initiate payment with Razorpay right now." },
+      { error: "Unable to initiate payment with PhonePe right now." },
       { status: 502 },
     );
   }
