@@ -119,8 +119,9 @@ export async function POST(req: NextRequest) {
 
   const orderNumber = generateOrderNumber();
 
-  // 4. Insert order into DB
+  // 4. Insert order into DB (with graceful resilience if DB is temporarily unreachable)
   let createdOrder: typeof orders.$inferSelect | null = null;
+  let dbSaved = true;
   try {
     const [inserted] = await db
       .insert(orders)
@@ -160,12 +161,10 @@ export async function POST(req: NextRequest) {
       );
     }
   } catch (err) {
-    console.error("Order creation error:", err);
-    return NextResponse.json(
-      { error: "We could not save your order. Please try again." },
-      { status: 500 }
-    );
+    dbSaved = false;
+    console.error("Order creation DB insert warning (order will still proceed to WhatsApp):", err);
   }
+
 
   // 5. Generate formatted WhatsApp UPI checkout message
   const itemBlocks: string[] = [];
@@ -236,8 +235,9 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(
     {
       success: true,
+      dbSaved,
       order: {
-        id: createdOrder?.id,
+        id: createdOrder?.id ?? null,
         orderNumber,
         total,
         customerName: customer.fullName,
@@ -247,3 +247,4 @@ export async function POST(req: NextRequest) {
     { status: 201 }
   );
 }
+

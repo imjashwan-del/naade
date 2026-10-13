@@ -64,6 +64,8 @@ export default function CheckoutPage() {
     return Object.keys(next).length === 0;
   }
 
+  const [createdWhatsAppUrl, setCreatedWhatsAppUrl] = useState<string | null>(null);
+
   async function handleWhatsAppCheckout() {
     setNotice(null);
     if (!validate() || !canSubmit) return;
@@ -75,17 +77,24 @@ export default function CheckoutPage() {
         items,
       });
 
-      // Clear the cart once the order is created in database
+      // Clear the cart once the order is successfully processed
       clearCart();
+      setCreatedWhatsAppUrl(whatsappUrl);
 
-      // Open / redirect to WhatsApp
-      window.location.assign(whatsappUrl);
+      // Perform a reliable top-level redirect that cannot be blocked like window.open
+      if (typeof window !== "undefined") {
+        window.location.href = whatsappUrl;
+      }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "We couldn't initiate WhatsApp checkout. Please try again or message us directly.";
       setNotice(msg);
       setSubmitting(false);
     }
   }
+
 
   if (!isLoaded) {
     return (
@@ -208,7 +217,20 @@ export default function CheckoutPage() {
           >
             {submitting ? "Creating Order & Opening WhatsApp…" : "Complete Order on WhatsApp"}
           </Button>
+
+          {createdWhatsAppUrl ? (
+            <p className="text-xs text-[var(--color-charcoal)]/80">
+              WhatsApp didn&apos;t open automatically?{" "}
+              <a
+                href={createdWhatsAppUrl}
+                className="font-medium underline underline-offset-4"
+              >
+                Click here to chat on WhatsApp
+              </a>
+            </p>
+          ) : null}
         </form>
+
 
         <aside className="h-fit border border-[var(--color-line)] p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]">
