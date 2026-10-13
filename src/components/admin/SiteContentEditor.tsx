@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   SITE_CONTENT_PAGES,
   type SiteContentPageId,
@@ -22,6 +23,7 @@ export function SiteContentEditor({
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
   const page = SITE_CONTENT_PAGES.find((item) => item.id === selectedPage)!;
   const previewPath =
     selectedPage === "home" || selectedPage === "global"
@@ -53,9 +55,9 @@ export function SiteContentEditor({
         return;
       }
       updateField(key, data.url);
-      setNotice("Image uploaded. Save this page to publish the change.");
+      setNotice("Image uploaded. Click 'Save page content' to publish.");
     } catch {
-      setError("Image upload failed. Check your connection and try again.");
+      setError("Image upload failed. Check connection and try again.");
     } finally {
       setUploadingField(null);
     }
@@ -73,7 +75,7 @@ export function SiteContentEditor({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           page: selectedPage,
-          content: values[selectedPage],
+          content: values[selectedPage] ?? {},
         }),
       });
       const data = await response.json();
@@ -81,11 +83,11 @@ export function SiteContentEditor({
         setError(data.error || "Unable to save page content.");
         return;
       }
-      setNotice(`${page.title} content saved.`);
+      setNotice(`Saved ${page.title} content successfully.`);
       router.refresh();
     } catch {
       setError(
-        "Unable to save page content. Check your connection and try again.",
+        "Unable to save page content. Check connection and try again.",
       );
     } finally {
       setSaving(false);
@@ -93,105 +95,182 @@ export function SiteContentEditor({
   }
 
   return (
-    <section className="border border-[var(--color-line)] bg-white">
-      <div className="flex flex-col gap-4 border-b border-[var(--color-line)] p-5 sm:flex-row sm:items-end sm:justify-between sm:p-6">
-        <label className="block w-full max-w-sm">
-          <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-charcoal)]/60">
-            Page
-          </span>
-          <select
-            value={selectedPage}
-            onChange={(event) =>
-              setSelectedPage(event.target.value as SiteContentPageId)
-            }
-            className="w-full border border-black/20 bg-white px-3 py-2.5 text-sm outline-none"
-          >
-            {SITE_CONTENT_PAGES.map((item) => (
-              <option key={item.id} value={item.id}>
+    <section className="border border-[var(--color-line)] bg-white shadow-sm">
+      {/* Category selector chips */}
+      <div className="border-b border-[var(--color-line)] bg-[var(--color-offwhite)]/50 p-4">
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]/60">
+          Select Section to Edit
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {SITE_CONTENT_PAGES.map((item) => {
+            const isSelected = item.id === selectedPage;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  setSelectedPage(item.id);
+                  setError(null);
+                  setNotice(null);
+                }}
+                className={`px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.08em] transition-colors ${
+                  isSelected
+                    ? "bg-[var(--color-charcoal)] text-[var(--color-ivory)]"
+                    : "border border-black/15 bg-white text-[var(--color-charcoal)]/80 hover:bg-black/5"
+                }`}
+              >
                 {item.title}
-              </option>
-            ))}
-          </select>
-        </label>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 border-b border-[var(--color-line)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div>
+          <h2 className="font-serif-display text-xl text-[var(--color-charcoal)]">
+            Editing {page.title}
+          </h2>
+          <p className="text-xs text-[var(--color-charcoal)]/60">
+            {page.fields.length} editable fields for this section
+          </p>
+        </div>
         <a
           href={previewPath}
           target="_blank"
           rel="noreferrer"
-          className="w-fit text-xs font-semibold uppercase tracking-[0.08em] underline underline-offset-4"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--color-maroon)] underline underline-offset-4 hover:opacity-80"
         >
-          Preview {page.title}
+          View Live {page.title} ↗
         </a>
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="grid gap-x-8 gap-y-5 p-5 sm:grid-cols-2 sm:p-6">
-          {page.fields.map((field) => (
-            <label
-              key={field.key}
-              className={`block ${field.type === "textarea" || field.type === "image" ? "sm:col-span-2" : ""}`}
-            >
-              <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-charcoal)]/60">
-                {field.label}
-              </span>
-              {field.type === "textarea" ? (
-                <textarea
-                  value={values[selectedPage][field.key] ?? ""}
-                  onChange={(event) =>
-                    updateField(field.key, event.target.value)
-                  }
-                  rows={3}
-                  className="w-full border border-black/20 px-3 py-2.5 text-sm outline-none focus:border-black/60"
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={values[selectedPage][field.key] ?? ""}
-                  onChange={(event) =>
-                    updateField(field.key, event.target.value)
-                  }
-                  className="w-full border border-black/20 px-3 py-2.5 text-sm outline-none focus:border-black/60"
-                />
-              )}
-              {field.type === "image" && (
-                <span className="mt-2 flex flex-wrap items-center gap-3">
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    aria-label={`Upload ${field.label.toLowerCase()}`}
-                    disabled={uploadingField === field.key}
-                    onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      if (file) void uploadImage(field.key, file);
-                      event.target.value = "";
-                    }}
-                    className="max-w-full text-xs text-[var(--color-charcoal)]/65 file:mr-3 file:border-0 file:bg-[var(--color-offwhite)] file:px-3 file:py-2 file:text-xs file:font-semibold"
+        <div className="grid gap-x-8 gap-y-6 p-5 sm:grid-cols-2 sm:p-6">
+          {page.fields.map((field) => {
+            const currentValue = values[selectedPage]?.[field.key] ?? "";
+            const isImage = field.type === "image";
+            const isTextarea = field.type === "textarea";
+
+            return (
+              <div
+                key={field.key}
+                className={`block ${isTextarea || isImage ? "sm:col-span-2" : ""}`}
+              >
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor={`field-${field.key}`}
+                    className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-charcoal)]/70"
+                  >
+                    {field.label}
+                  </label>
+                  <span className="text-[10px] uppercase tracking-wider text-[var(--color-charcoal)]/40">
+                    {field.key}
+                  </span>
+                </div>
+
+                {isTextarea ? (
+                  <textarea
+                    id={`field-${field.key}`}
+                    value={currentValue}
+                    onChange={(event) =>
+                      updateField(field.key, event.target.value)
+                    }
+                    rows={field.key.includes("Copy") || field.key.includes("Description") || field.key.startsWith("a") ? 4 : 2}
+                    className="mt-2 w-full border border-black/20 bg-white p-3 text-sm leading-relaxed text-[var(--color-charcoal)] outline-none focus:border-[var(--color-charcoal)] focus:ring-1 focus:ring-[var(--color-charcoal)]"
                   />
-                  {uploadingField === field.key && (
-                    <span className="text-xs text-[var(--color-charcoal)]/55">
-                      Uploading…
-                    </span>
-                  )}
-                </span>
-              )}
-            </label>
-          ))}
+                ) : (
+                  <input
+                    id={`field-${field.key}`}
+                    type="text"
+                    value={currentValue}
+                    onChange={(event) =>
+                      updateField(field.key, event.target.value)
+                    }
+                    className="mt-2 w-full border border-black/20 bg-white px-3 py-2 text-sm text-[var(--color-charcoal)] outline-none focus:border-[var(--color-charcoal)] focus:ring-1 focus:ring-[var(--color-charcoal)]"
+                  />
+                )}
+
+                {isImage && (
+                  <div className="mt-3 flex flex-wrap items-center gap-4 rounded border border-[var(--color-line)] bg-[var(--color-offwhite)]/30 p-3">
+                    {currentValue ? (
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded border border-black/15 bg-white">
+                        <Image
+                          src={currentValue}
+                          alt="Preview"
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded border border-dashed border-black/20 text-[10px] text-black/40">
+                        No image
+                      </div>
+                    )}
+
+                    <div className="flex-1 space-y-1">
+                      <p className="text-[11px] font-medium text-[var(--color-charcoal)]">
+                        Upload replacement image:
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        aria-label={`Upload ${field.label.toLowerCase()}`}
+                        disabled={uploadingField === field.key}
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+                          if (file) void uploadImage(field.key, file);
+                          event.target.value = "";
+                        }}
+                        className="max-w-full text-xs text-[var(--color-charcoal)]/75 file:mr-3 file:border-0 file:bg-[var(--color-charcoal)] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:uppercase file:tracking-wider file:text-white"
+                      />
+                      {uploadingField === field.key && (
+                        <p className="text-xs font-semibold text-[var(--color-maroon)]">
+                          Uploading image…
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-[var(--color-line)] p-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p aria-live="polite" className="min-h-5 text-sm">
+        <div className="sticky bottom-0 flex flex-col gap-3 border-t border-[var(--color-line)] bg-white/95 p-5 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <p aria-live="polite" className="min-h-5 text-sm font-medium">
             {error ? (
-              <span className="text-red-700">{error}</span>
+              <span className="text-[var(--color-maroon)]">✕ {error}</span>
             ) : notice ? (
-              <span className="text-green-800">{notice}</span>
+              <span className="text-emerald-800">✓ {notice}</span>
             ) : null}
           </p>
-          <button
-            type="submit"
-            disabled={saving || uploadingField !== null}
-            className="bg-[var(--color-charcoal)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-white disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {saving ? "Saving…" : "Save page content"}
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                const defaults = Object.fromEntries(
+                  page.fields.map((f) => [f.key, f.defaultValue])
+                );
+                setValues((prev) => ({
+                  ...prev,
+                  [selectedPage]: defaults,
+                }));
+                setNotice(`Reset fields to initial defaults. Click Save to apply.`);
+              }}
+              className="border border-black/20 bg-white px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--color-charcoal)] hover:bg-black/5"
+            >
+              Reset to Defaults
+            </button>
+            <button
+              type="submit"
+              disabled={saving || uploadingField !== null}
+              className="bg-[var(--color-charcoal)] px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ivory)] hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {saving ? "Saving…" : "Save Page Content"}
+            </button>
+          </div>
         </div>
       </form>
     </section>

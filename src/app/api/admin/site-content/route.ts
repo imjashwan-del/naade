@@ -26,37 +26,40 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Unknown page." }, { status: 400 });
   }
 
-  const allowedFields = new Set<string>(page.fields.map((field) => field.key));
-  const entries = Object.entries(parsed.data.content);
-  if (
-    entries.length !== allowedFields.size ||
-    entries.some(([key, value]) => {
-      if (!allowedFields.has(key)) return true;
-      const field = page.fields.find((item) => item.key === key);
-      return (
-        field?.type === "image" &&
-        value !== "" &&
-        !value.startsWith("/") &&
-        !/^https?:\/\//i.test(value)
+  const allowedFields = new Map<string, { key: string; type: string }>(
+    page.fields.map((field) => [field.key, field]),
+  );
+  const filteredContent: Record<string, string> = {};
+
+  for (const [key, value] of Object.entries(parsed.data.content)) {
+    const fieldDef = allowedFields.get(key);
+    if (!fieldDef) continue; // ignore unknown keys
+
+    if (
+      fieldDef.type === "image" &&
+      value !== "" &&
+      !value.startsWith("/") &&
+      !/^https?:\/\//i.test(value)
+    ) {
+      return NextResponse.json(
+        { error: `Invalid image URL for field ${key}` },
+        { status: 400 },
       );
-    })
-  ) {
-    return NextResponse.json(
-      { error: "Page content contains invalid fields." },
-      { status: 400 },
-    );
+    }
+
+    filteredContent[key] = value;
   }
 
   await db
     .insert(siteContent)
     .values({
       pageId: page.id,
-      content: parsed.data.content,
+      content: filteredContent,
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({
       target: siteContent.pageId,
-      set: { content: parsed.data.content, updatedAt: new Date() },
+      set: { content: filteredContent, updatedAt: new Date() },
     });
 
   return NextResponse.json({ saved: true });

@@ -8,13 +8,26 @@ export type SiteContentField = {
 export const SITE_CONTENT_PAGES = [
   {
     id: "global",
-    title: "Header & footer",
+    title: "Header & Footer",
     fields: [
       {
         key: "brand",
         label: "Brand name",
         type: "text",
         defaultValue: "NAADE",
+      },
+      {
+        key: "announcementEnabled",
+        label: "Show announcement bar (true/false)",
+        type: "text",
+        defaultValue: "true",
+      },
+      {
+        key: "announcementText",
+        label: "Announcement text",
+        type: "text",
+        defaultValue:
+          "Handwoven Pochampally Ikat • Complimentary Shipping in India • Bespoke Sizing Available",
       },
       {
         key: "navShop",
@@ -35,6 +48,24 @@ export const SITE_CONTENT_PAGES = [
         defaultValue: "Shirts",
       },
       {
+        key: "navMadeToMeasure",
+        label: "Made to Measure navigation",
+        type: "text",
+        defaultValue: "Made to Measure",
+      },
+      {
+        key: "navStory",
+        label: "Our Story navigation",
+        type: "text",
+        defaultValue: "Our Story",
+      },
+      {
+        key: "navFaq",
+        label: "FAQ navigation",
+        type: "text",
+        defaultValue: "FAQ",
+      },
+      {
         key: "navNew",
         label: "New arrivals navigation",
         type: "text",
@@ -51,6 +82,18 @@ export const SITE_CONTENT_PAGES = [
         label: "Shopping bag label",
         type: "text",
         defaultValue: "Bag",
+      },
+      {
+        key: "contactPhone",
+        label: "Contact phone",
+        type: "text",
+        defaultValue: "+91 8555909550",
+      },
+      {
+        key: "contactEmail",
+        label: "Contact email",
+        type: "text",
+        defaultValue: "hello@naade.in",
       },
       {
         key: "footerTagline",
@@ -152,7 +195,7 @@ export const SITE_CONTENT_PAGES = [
         key: "heroEyebrow",
         label: "Hero eyebrow",
         type: "text",
-        defaultValue: "NAADE",
+        defaultValue: "POCHAMPALLY IKAT • TELANGANA",
       },
       {
         key: "heroTitle",
@@ -179,16 +222,70 @@ export const SITE_CONTENT_PAGES = [
         defaultValue: "Shop Shirts",
       },
       {
+        key: "trustTitle",
+        label: "Trust section title",
+        type: "text",
+        defaultValue: "Crafted With Intention",
+      },
+      {
+        key: "trust1Title",
+        label: "Trust item 1 title",
+        type: "text",
+        defaultValue: "Pochampally GI Cluster",
+      },
+      {
+        key: "trust1Copy",
+        label: "Trust item 1 copy",
+        type: "text",
+        defaultValue: "Handwoven in Telangana with authentic resist-dyed yarns.",
+      },
+      {
+        key: "trust2Title",
+        label: "Trust item 2 title",
+        type: "text",
+        defaultValue: "Bespoke Measurements",
+      },
+      {
+        key: "trust2Copy",
+        label: "Trust item 2 copy",
+        type: "text",
+        defaultValue: "Custom tailored from individual cloth lengths at no extra cost.",
+      },
+      {
+        key: "trust3Title",
+        label: "Trust item 3 title",
+        type: "text",
+        defaultValue: "100% Handloom Cottons",
+      },
+      {
+        key: "trust3Copy",
+        label: "Trust item 3 copy",
+        type: "text",
+        defaultValue: "Breathable natural fibers woven on traditional pit looms.",
+      },
+      {
+        key: "trust4Title",
+        label: "Trust item 4 title",
+        type: "text",
+        defaultValue: "Direct Studio Model",
+      },
+      {
+        key: "trust4Copy",
+        label: "Trust item 4 copy",
+        type: "text",
+        defaultValue: "Connected directly to master artisans and weaving families.",
+      },
+      {
         key: "featuredEyebrow",
         label: "Collection eyebrow",
         type: "text",
-        defaultValue: "Featured",
+        defaultValue: "The Edit",
       },
       {
         key: "featuredTitle",
         label: "Collection title",
         type: "text",
-        defaultValue: "The Collection",
+        defaultValue: "Featured Pieces",
       },
       {
         key: "featuredCopy",
@@ -255,20 +352,20 @@ export const SITE_CONTENT_PAGES = [
         key: "weaveEyebrow",
         label: "Weave eyebrow",
         type: "text",
-        defaultValue: "Craft",
+        defaultValue: "Craft & Geometry",
       },
       {
         key: "weaveTitle",
         label: "Weave title",
         type: "text",
-        defaultValue: "The Weave",
+        defaultValue: "The Architecture of Ikat",
       },
       {
         key: "weaveCopy",
         label: "Weave description",
         type: "textarea",
         defaultValue:
-          "Pochampally Ikat is created by resist-dyeing yarns before weaving, allowing the pattern to emerge through the structure of the cloth itself.",
+          "Pochampally Ikat is created by resist-dyeing yarns before weaving, allowing the pattern to emerge through the structure of the cloth itself. The calculated geometry requires weeks of mathematical tying and precision handloom weaving.",
       },
       {
         key: "measureImage",
@@ -287,26 +384,194 @@ export const SITE_CONTENT_PAGES = [
         key: "measureEyebrow",
         label: "Made-to-measure eyebrow",
         type: "text",
-        defaultValue: "Made to Measure",
+        defaultValue: "Personal Fit",
       },
       {
         key: "measureTitle",
         label: "Made-to-measure title",
         type: "textarea",
-        defaultValue: "Your fit.\nYour NAADE.",
+        defaultValue: "Your Fit.\nYour NAADE.",
       },
       {
         key: "measureCopy",
         label: "Made-to-measure description",
         type: "textarea",
         defaultValue:
-          "Selected NAADE pieces can be made using your measurements for a more personal fit.",
+          "Selected NAADE pieces can be cut to your individual measurements. We believe handwoven clothing should fit with quiet confidence.",
       },
       {
         key: "measureButton",
         label: "Made-to-measure button",
         type: "text",
         defaultValue: "Explore Made to Measure",
+      },
+    ],
+  },
+  {
+    id: "story",
+    title: "Our Story",
+    fields: [
+      {
+        key: "eyebrow",
+        label: "Eyebrow",
+        type: "text",
+        defaultValue: "Heritage & Craft",
+      },
+      {
+        key: "title",
+        label: "Title",
+        type: "text",
+        defaultValue: "Rooted in Pochampally",
+      },
+      {
+        key: "subtitle",
+        label: "Subtitle",
+        type: "textarea",
+        defaultValue:
+          "The intersection of ancient mathematical resist-dyeing and contemporary Indian menswear.",
+      },
+      {
+        key: "image",
+        label: "Story image",
+        type: "image",
+        defaultValue: "/images/weave-texture.jpg",
+      },
+      {
+        key: "imageAlt",
+        label: "Story image description",
+        type: "text",
+        defaultValue: "Handloom pit loom yarns in Pochampally",
+      },
+      {
+        key: "p1",
+        label: "Story paragraph 1",
+        type: "textarea",
+        defaultValue:
+          "In Pochampally, Telangana, cloth is not simply woven; it is calculated, tie-dyed in bundles, and aligned down to the millimeter before a single shuttle moves across the loom. This intricate process gives Ikat its signature softened edges and distinctive structural depth.",
+      },
+      {
+        key: "p2",
+        label: "Story paragraph 2",
+        type: "textarea",
+        defaultValue:
+          "NAADE was founded to translate this extraordinary GI-tagged handloom craft into modern, wearable silhouettes. Rather than treating Ikat as costume fabric or occasion-only attire, we build structured jackets, relaxed shirts, and tailored layers that belong in the modern wardrobe.",
+      },
+      {
+        key: "p3",
+        label: "Story paragraph 3",
+        type: "textarea",
+        defaultValue:
+          "Every garment begins in family-owned pit loom studios across Telangana. By working directly with master dyers and weavers, NAADE honors the craftsmanship, ensures honest livelihoods, and keeps the tactile spirit of Indian handlooms alive.",
+      },
+      {
+        key: "quote",
+        label: "Featured quote",
+        type: "textarea",
+        defaultValue:
+          "The beauty of handwoven Ikat lies in its slight human irregularities — proof that every thread was placed by deliberate human touch.",
+      },
+    ],
+  },
+  {
+    id: "faq",
+    title: "FAQ",
+    fields: [
+      {
+        key: "eyebrow",
+        label: "Eyebrow",
+        type: "text",
+        defaultValue: "Customer Care",
+      },
+      {
+        key: "title",
+        label: "Title",
+        type: "text",
+        defaultValue: "Frequently Asked Questions",
+      },
+      {
+        key: "subtitle",
+        label: "Subtitle",
+        type: "textarea",
+        defaultValue:
+          "Clear answers regarding our handloom craft, bespoke sizing, ordering process, and shipping.",
+      },
+      {
+        key: "q1",
+        label: "Question 1",
+        type: "text",
+        defaultValue: "What makes Pochampally Ikat handloom unique?",
+      },
+      {
+        key: "a1",
+        label: "Answer 1",
+        type: "textarea",
+        defaultValue:
+          "Pochampally Ikat is an authentic Geographical Indication (GI) textile from Telangana. Unlike machine-printed patterns, the designs are created by resist-dyeing warp and weft yarn bundles with mathematical precision prior to weaving. When woven on traditional pit looms, the pattern manifests directly from the weave itself.",
+      },
+      {
+        key: "q2",
+        label: "Question 2",
+        type: "text",
+        defaultValue: "How does the Made-to-Measure service work?",
+      },
+      {
+        key: "a2",
+        label: "Answer 2",
+        type: "textarea",
+        defaultValue:
+          "Selected pieces can be tailored to your exact measurements at no extra fee. On eligible product pages, select 'Make It To My Measurements' and submit your chest, waist, shoulder, sleeve length, garment length, and neck in inches. Our Pochampally atelier cuts and finishes your garment individually.",
+      },
+      {
+        key: "q3",
+        label: "Question 3",
+        type: "text",
+        defaultValue: "What are your shipping timelines across India?",
+      },
+      {
+        key: "a3",
+        label: "Answer 3",
+        type: "textarea",
+        defaultValue:
+          "Standard-size garments are dispatched within 3–5 business days. Made-to-measure pieces are tailored from scratch and dispatch within 2–3 weeks. We offer complimentary shipping across India on all orders.",
+      },
+      {
+        key: "q4",
+        label: "Question 4",
+        type: "text",
+        defaultValue: "How do I place an order via WhatsApp & UPI?",
+      },
+      {
+        key: "a4",
+        label: "Answer 4",
+        type: "textarea",
+        defaultValue:
+          "At checkout, complete your shipping address and select 'WhatsApp UPI Order'. You will be redirected to WhatsApp with your official NAADE Order ID prefilled. Our team will verify your items and share the payment QR code. Once paid, share the transaction screenshot to confirm your order.",
+      },
+      {
+        key: "q5",
+        label: "Question 5",
+        type: "text",
+        defaultValue: "How do I care for my NAADE Ikat pieces?",
+      },
+      {
+        key: "a5",
+        label: "Answer 5",
+        type: "textarea",
+        defaultValue:
+          "We recommend professional dry cleaning for structured jackets and silk-blend pieces to maintain the weave's integrity. Pure cotton shirts can be hand-washed separately in cold water with mild detergent, dried in the shade, and pressed on the reverse side with a warm iron.",
+      },
+      {
+        key: "q6",
+        label: "Question 6",
+        type: "text",
+        defaultValue: "What is your return and exchange policy?",
+      },
+      {
+        key: "a6",
+        label: "Answer 6",
+        type: "textarea",
+        defaultValue:
+          "Standard size pieces in unworn condition with original tags can be returned within 7 days of delivery. Because made-to-measure pieces are cut specifically to your personal proportions, they are final sale unless damaged during transit or defective.",
       },
     ],
   },
@@ -597,11 +862,7 @@ export const SITE_CONTENT_PAGES = [
       },
     ],
   },
-] as const satisfies readonly {
-  id: string;
-  title: string;
-  fields: readonly SiteContentField[];
-}[];
+] as const;
 
 export type SiteContentPageId = (typeof SITE_CONTENT_PAGES)[number]["id"];
 export type SiteContentValues = Record<string, string>;
