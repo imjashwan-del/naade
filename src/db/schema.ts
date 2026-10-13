@@ -65,12 +65,28 @@ export const orders = pgTable("orders", {
   trackingNumber: text("tracking_number"),
   trackingUrl: text("tracking_url"),
   phonePeTransactionId: text("phone_pe_transaction_id"),
+  whatsappNotifiedAt: timestamp("whatsapp_notified_at"),
+  whatsappPhone: text("whatsapp_phone"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
+
+export const whatsappWebhookEvents = pgTable("whatsapp_webhook_events", {
+  id: serial("id").primaryKey(),
+  metaMessageId: text("meta_message_id").notNull().unique(),
+  senderPhone: text("sender_phone").notNull(),
+  orderNumber: text("order_number"),
+  eventType: text("event_type").notNull().default("message"),
+  payload: jsonb("payload").$type<Record<string, unknown>>().notNull().default({}),
+  processedAt: timestamp("processed_at").notNull().defaultNow(),
+});
+
+export type WhatsappWebhookEvent = typeof whatsappWebhookEvents.$inferSelect;
+export type NewWhatsappWebhookEvent = typeof whatsappWebhookEvents.$inferInsert;
+
 
 export type OrderItemMeasurements = {
   chest: string;
