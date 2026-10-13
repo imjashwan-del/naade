@@ -168,37 +168,70 @@ export async function POST(req: NextRequest) {
   }
 
   // 5. Generate formatted WhatsApp UPI checkout message
-  const itemSummaryLines = resolvedItems.map((i) => {
-    const variantDesc = i.isMadeToMeasure
-      ? "Made-to-Measure"
-      : i.size
-      ? `Size: ${i.size}`
-      : "";
-    return `• ${i.name} (Qty: ${i.quantity}${variantDesc ? `, ${variantDesc}` : ""}) - ₹${(i.price * i.quantity).toLocaleString("en-IN")}`;
-  });
+  const itemBlocks: string[] = [];
+  for (const i of resolvedItems) {
+    const lines: string[] = [];
+    lines.push(i.name);
+
+    const specs: string[] = [];
+    if (i.size) {
+      specs.push(`Size: ${i.size}`);
+    }
+    specs.push(`Qty: ${i.quantity}`);
+    specs.push(`Price: ₹${(i.price * i.quantity).toLocaleString("en-IN")}`);
+    lines.push(specs.join(" | "));
+
+    if (i.isMadeToMeasure && i.measurements) {
+      const m = i.measurements;
+      const measureParts: string[] = [];
+      if (m.chest) measureParts.push(`Chest: ${m.chest}"`);
+      if (m.waist) measureParts.push(`Waist: ${m.waist}"`);
+      if (m.shoulder) measureParts.push(`Shoulder: ${m.shoulder}"`);
+      if (m.sleeveLength) measureParts.push(`Sleeve: ${m.sleeveLength}"`);
+      if (m.garmentLength) measureParts.push(`Length: ${m.garmentLength}"`);
+      if (m.neck) measureParts.push(`Neck: ${m.neck}"`);
+      if (measureParts.length > 0) {
+        lines.push(`Measurements (MTM): ${measureParts.join(", ")}`);
+      }
+    }
+    itemBlocks.push(lines.join("\n"));
+  }
 
   const messageLines = [
-    "Hello NAADE! I'd like to complete my order.",
+    "Hello NAADE Team,",
     "",
-    `📋 *Order ID:* ${orderNumber}`,
-    `👤 *Name:* ${customer.fullName}`,
-    `📞 *Phone:* ${customer.phone}`,
-    `📍 *Delivery:* ${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}`,
+    "I'd like to place an order with NAADE.",
     "",
-    "*Items:*",
-    ...itemSummaryLines,
+    "*ORDER DETAILS*",
+    `Order ID: ${orderNumber}`,
     "",
-    `💰 *Subtotal:* ₹${subtotal.toLocaleString("en-IN")}`,
-    `🚚 *Shipping:* ${shipping === 0 ? "Free" : `₹${shipping.toLocaleString("en-IN")}`}`,
-    `💳 *Total:* ₹${total.toLocaleString("en-IN")}`,
+    "*CUSTOMER DETAILS*",
+    `Name: ${customer.fullName}`,
+    `Phone: ${customer.phone}`,
     "",
-    "Please share your UPI payment QR / details for this order.",
+    "*DELIVERY ADDRESS*",
+    customer.address,
+    `${customer.city}, ${customer.state} - ${customer.pincode}`,
+    "",
+    "*ORDER SUMMARY*",
+    itemBlocks.join("\n\n"),
+    "",
+    `Subtotal: ₹${subtotal.toLocaleString("en-IN")}`,
+    `Shipping: ${shipping === 0 ? "Free" : `₹${shipping.toLocaleString("en-IN")}`}`,
+    `*TOTAL: ₹${total.toLocaleString("en-IN")}*`,
+    "",
+    "Please share the UPI payment details for this order. I'll complete the payment after confirmation.",
+    "",
+    "Thank you.",
+    "",
+    customer.fullName ? customer.fullName : "NAADE Customer",
   ];
 
   const whatsappMessage = messageLines.join("\n");
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     whatsappMessage
   )}`;
+
 
   return NextResponse.json(
     {
