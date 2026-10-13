@@ -23,3 +23,23 @@ ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "whatsapp_notified_at" timestamp w
 ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "whatsapp_phone" text;
 
 COMMENT ON TABLE "whatsapp_webhook_events" IS 'Stores processed incoming Meta WhatsApp messages for idempotency and security audit.';
+
+-- 4. Secure table with Row Level Security (RLS)
+ALTER TABLE "whatsapp_webhook_events" ENABLE ROW LEVEL SECURITY;
+
+-- Allow only service_role (backend/edge functions) to access webhook events
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'whatsapp_webhook_events' 
+    AND policyname = 'Service role full access on whatsapp_webhook_events'
+  ) THEN
+    CREATE POLICY "Service role full access on whatsapp_webhook_events"
+      ON "whatsapp_webhook_events"
+      FOR ALL
+      TO service_role
+      USING (true)
+      WITH CHECK (true);
+  END IF;
+END $$;

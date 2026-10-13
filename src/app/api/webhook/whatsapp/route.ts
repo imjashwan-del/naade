@@ -74,8 +74,12 @@ export async function GET(req: NextRequest) {
   const token = url.searchParams.get("hub.verify_token");
   const challenge = url.searchParams.get("hub.challenge");
 
-  const configuredVerifyToken =
-    process.env.WHATSAPP_VERIFY_TOKEN || "naade_whatsapp_verify_token";
+  const configuredVerifyToken = process.env.WHATSAPP_VERIFY_TOKEN;
+
+  if (!configuredVerifyToken) {
+    console.error("[whatsapp-webhook] WHATSAPP_VERIFY_TOKEN is not configured in server environment.");
+    return new Response("Webhook verification unconfigured", { status: 403 });
+  }
 
   if (mode === "subscribe" && token === configuredVerifyToken && challenge) {
     return new Response(challenge, {
@@ -87,19 +91,26 @@ export async function GET(req: NextRequest) {
   return new Response("Forbidden", { status: 403 });
 }
 
+
 // 2. Incoming WhatsApp Message Handler (POST)
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const appSecret = process.env.WHATSAPP_APP_SECRET;
 
+  if (process.env.NODE_ENV === "production" && !appSecret) {
+    console.error("[whatsapp-webhook] WHATSAPP_APP_SECRET is required in production for webhook security.");
+    return NextResponse.json({ error: "Webhook security unconfigured" }, { status: 500 });
+  }
+
   if (appSecret) {
     const signatureHeader = req.headers.get("x-hub-signature-256");
     const isValid = await verifyMetaSignature(rawBody, signatureHeader, appSecret);
     if (!isValid) {
-      console.error("[whatsapp-webhook] Invalid Meta signature");
+      console.error("[whatsapp-webhook] Invalid or missing Meta X-Hub-Signature-256");
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
   }
+
 
   let body: Record<string, unknown>;
   try {
