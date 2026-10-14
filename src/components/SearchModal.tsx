@@ -23,6 +23,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery("");
     }
     return () => {

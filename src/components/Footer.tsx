@@ -16,7 +16,7 @@ function getColumns(content: SiteContentValues) {
       title: content.footerAbout || "About",
       links: [
         { href: "/story", label: content.footerStory || "Our Story" },
-        { href: "/#weave", label: content.footerWeave || "The Weave" },
+        { href: "/story", label: content.footerWeave || "The Weave" },
         { href: "/made-to-measure", label: "Bespoke Atelier" },
       ],
     },
