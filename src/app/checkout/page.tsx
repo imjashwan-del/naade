@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { Button, LinkButton } from "@/components/Button";
-import { createWhatsAppCheckoutOrder } from "@/lib/whatsapp-checkout";
 
 type FormState = {
   fullName: string;
@@ -31,6 +31,7 @@ const SHIPPING_THRESHOLD = 5000;
 const SHIPPING_FEE = 199;
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { items, subtotal, isLoaded, clearCart } = useCart();
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<
@@ -55,46 +56,60 @@ export default function CheckoutPage() {
     if (form.fullName.trim().length < 2) next.fullName = "Enter your full name";
     if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = "Enter a valid email";
     if (form.phone.trim().length < 10)
-      next.phone = "Enter a valid phone number";
-    if (form.address.trim().length < 5) next.address = "Enter your address";
+      next.phone = "Enter a valid 10-digit phone number";
+    if (form.address.trim().length < 5) next.address = "Enter your complete street address";
     if (form.city.trim().length < 2) next.city = "Enter your city";
     if (form.state.trim().length < 2) next.state = "Enter your state";
-    if (form.pincode.trim().length < 4) next.pincode = "Enter a valid pincode";
+    if (form.pincode.trim().length < 4) next.pincode = "Enter a valid postal pincode";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
 
-  const [createdWhatsAppUrl, setCreatedWhatsAppUrl] = useState<string | null>(null);
-
-  async function handleWhatsAppCheckout() {
+  async function handleProceedToUpi() {
     setNotice(null);
     if (!validate() || !canSubmit) return;
     setSubmitting(true);
 
     try {
-      const { whatsappUrl } = await createWhatsAppCheckoutOrder({
-        customer: form,
-        items,
+      const response = await fetch("/api/checkout/initiate-upi", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customer: form,
+          items,
+        }),
       });
 
-      // Clear the cart once the order is successfully processed
-      clearCart();
-      setCreatedWhatsAppUrl(whatsappUrl);
+      const data = await response.json().catch(() => ({}));
 
-      // Perform a reliable top-level redirect that cannot be blocked like window.open
-      if (typeof window !== "undefined") {
-        window.location.href = whatsappUrl;
+      if (!response.ok) {
+        const msg =
+          data.error ||
+          (Array.isArray(data.details)
+            ? data.details.map((d: { message?: string }) => d.message).filter(Boolean).join(", ")
+            : null) ||
+          "Unable to initiate checkout. Please verify your details.";
+        setNotice(msg);
+        setSubmitting(false);
+        return;
       }
+
+      // Clear the local cart now that the payment attempt has been safely saved on server
+      clearCart();
+
+      // Navigate to the direct UPI payment and verification page
+      router.push(`/order-status/${data.orderReference}`);
     } catch (err: unknown) {
       const msg =
         err instanceof Error
           ? err.message
-          : "We couldn't initiate WhatsApp checkout. Please try again or message us directly.";
+          : "We encountered an unexpected error initiating payment. Please try again.";
       setNotice(msg);
       setSubmitting(false);
     }
   }
-
 
   if (!isLoaded) {
     return (
@@ -113,7 +128,7 @@ export default function CheckoutPage() {
           Your bag is empty
         </h1>
         <p className="mt-3 text-sm text-[var(--color-charcoal)]/60">
-          Add something to your bag before checking out.
+          Add pieces to your bag before checking out.
         </p>
         <div className="mt-8">
           <LinkButton href="/shop">Continue Shopping</LinkButton>
@@ -132,17 +147,17 @@ export default function CheckoutPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleWhatsAppCheckout();
+            handleProceedToUpi();
           }}
           className="flex flex-col gap-5"
         >
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]">
-              Customer Information
+              Delivery Details
             </p>
-            <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-charcoal)]/60">
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-              WhatsApp UPI Order
+            <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-charcoal)]/70">
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-600" />
+              Direct UPI Payment
             </span>
           </div>
 
@@ -154,14 +169,14 @@ export default function CheckoutPage() {
           />
           <div className="grid gap-5 sm:grid-cols-2">
             <Field
-              label="Email"
+              label="Email Address"
               type="email"
               value={form.email}
               error={errors.email}
               onChange={(v) => update("email", v)}
             />
             <Field
-              label="WhatsApp / Phone Number"
+              label="Phone Number"
               type="tel"
               value={form.phone}
               error={errors.phone}
@@ -201,38 +216,34 @@ export default function CheckoutPage() {
             </p>
           ) : null}
 
-          <div className="mt-2 rounded border border-emerald-900/15 bg-emerald-50/50 p-4 text-xs text-emerald-900">
-            <p className="font-medium">How payment works:</p>
-            <ol className="mt-1.5 list-inside list-decimal space-y-1 opacity-80">
-              <li>Clicking below will save your order and open WhatsApp.</li>
-              <li>Send the prefilled message with your Order ID.</li>
-              <li>We will share the official UPI QR code &amp; details to complete payment.</li>
+          {/* Payment Guidance Box */}
+          <div className="mt-2 rounded-sm border border-[var(--color-line)] bg-[var(--color-offwhite)]/80 p-5 text-xs text-[var(--color-charcoal)]">
+            <p className="font-semibold uppercase tracking-[0.08em] text-[var(--color-charcoal)]">
+              Direct UPI Payment Flow
+            </p>
+            <ol className="mt-2.5 list-inside list-decimal space-y-1.5 leading-relaxed text-[var(--color-charcoal)]/80">
+              <li>
+                Clicking <strong>Proceed to UPI Payment</strong> will generate your unique order reference.
+              </li>
+              <li>
+                You can pay using PhonePe, Google Pay, Paytm, or any compatible UPI app on your phone, or scan the UPI QR code.
+              </li>
+              <li>
+                Once paid, our Pochampally atelier verifies the incoming bank credit and confirms your order.
+              </li>
             </ol>
           </div>
 
           <Button
             type="submit"
             disabled={submitting}
-            className="mt-2 w-full sm:w-auto"
+            className="mt-3 w-full sm:w-auto"
           >
-            {submitting ? "Creating Order & Opening WhatsApp…" : "Complete Order on WhatsApp"}
+            {submitting ? "Initiating UPI Payment…" : "Proceed to UPI Payment →"}
           </Button>
-
-          {createdWhatsAppUrl ? (
-            <p className="text-xs text-[var(--color-charcoal)]/80">
-              WhatsApp didn&apos;t open automatically?{" "}
-              <a
-                href={createdWhatsAppUrl}
-                className="font-medium underline underline-offset-4"
-              >
-                Click here to chat on WhatsApp
-              </a>
-            </p>
-          ) : null}
         </form>
 
-
-        <aside className="h-fit border border-[var(--color-line)] p-6">
+        <aside className="h-fit border border-[var(--color-line)] bg-white/50 p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]">
             Order Summary
           </p>
@@ -248,7 +259,7 @@ export default function CheckoutPage() {
                   </p>
                   <p className="text-xs text-[var(--color-charcoal)]/55">
                     {item.isMadeToMeasure
-                      ? "Made to Measure"
+                      ? "Made to Measure (Custom Fit)"
                       : item.size
                         ? `Size ${item.size}`
                         : ""}
@@ -271,13 +282,13 @@ export default function CheckoutPage() {
                 {shipping === 0 ? "Complimentary" : formatPrice(shipping)}
               </span>
             </div>
-            <div className="mt-2 flex justify-between border-t border-[var(--color-line)] pt-3 text-base font-medium">
-              <span>Total</span>
+            <div className="mt-2 flex justify-between border-t border-[var(--color-line)] pt-3 text-base font-semibold">
+              <span>Payable Total</span>
               <span>{formatPrice(total)}</span>
             </div>
           </div>
           <p className="mt-4 text-xs text-[var(--color-charcoal)]/50">
-            Orders are confirmed after UPI payment verification.{" "}
+            Orders are confirmed upon atelier payment verification.{" "}
             <Link href="/cart" className="underline underline-offset-4">
               Edit bag
             </Link>

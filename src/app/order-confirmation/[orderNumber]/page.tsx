@@ -20,7 +20,11 @@ export default async function OrderConfirmationPage({
     .where(eq(orders.orderNumber, orderNumber))
     .limit(1);
   const order = orderRows[0];
-  if (!order) notFound();
+
+  if (!order) {
+    const { redirect } = await import("next/navigation");
+    redirect(`/order-status/${orderNumber}`);
+  }
 
   const items = await db
     .select()

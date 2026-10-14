@@ -173,6 +173,18 @@ export const SITE_CONTENT_PAGES = [
         type: "text",
         defaultValue: "Pochampally · Telangana · India",
       },
+      {
+        key: "receivingUpiId",
+        label: "Receiving UPI ID (e.g. merchant@upi or yourname@bank)",
+        type: "text",
+        defaultValue: "",
+      },
+      {
+        key: "upiPayeeName",
+        label: "UPI Payee Display Name",
+        type: "text",
+        defaultValue: "NAADE",
+      },
     ],
   },
   {

@@ -40,3 +40,30 @@ export const createOrderSchema = z.object({
 });
 
 export type CustomerInfo = z.infer<typeof customerInfoSchema>;
+
+export const submitUpiReferenceSchema = z.object({
+  orderReference: z.string().min(5),
+  customerUpiReference: z
+    .string()
+    .trim()
+    .min(3, "Enter your UPI reference / UTR number")
+    .max(60),
+  customerNote: z.string().trim().max(300).optional(),
+});
+
+export const adminVerifyPaymentSchema = z.object({
+  verifiedTransactionReference: z
+    .string()
+    .trim()
+    .min(3, "Enter the verified bank / PhonePe transaction reference or UTR")
+    .max(100),
+  notes: z.string().trim().max(500).optional(),
+});
+
+export const adminRejectPaymentSchema = z.object({
+  reason: z
+    .string()
+    .trim()
+    .min(3, "Enter reason for cancellation / rejection")
+    .max(500),
+});

@@ -83,7 +83,9 @@ async function createAdmin() {
   console.log(`Admin credentials saved for ${email}.`);
 }
 
-createAdmin().catch((error) => {
-  console.error(`Unable to create admin: ${error.message}`);
-  process.exitCode = 1;
-});
+createAdmin()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(`Unable to create admin: ${error.message}`);
+    process.exit(1);
+  });

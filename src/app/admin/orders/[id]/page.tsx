@@ -110,6 +110,32 @@ export default function AdminOrderDetailPage({
         </div>
       </div>
 
+      {/* Payment Verification Record */}
+      <div className="mt-6 rounded-sm border border-[var(--color-line)] bg-emerald-50/60 p-4 text-xs text-emerald-950">
+        <p className="font-semibold uppercase tracking-[0.1em] text-emerald-900">
+          Payment Verification Record
+        </p>
+        <div className="mt-2 grid gap-2 sm:grid-cols-3">
+          <div>
+            <span className="text-[var(--color-charcoal)]/60">Payment:</span>
+            <span className="ml-1.5 font-bold uppercase text-emerald-900">{order.paymentStatus}</span>
+          </div>
+          <div>
+            <span className="text-[var(--color-charcoal)]/60">Bank UTR / Ref:</span>
+            <span className="ml-1.5 font-mono font-medium">{order.verifiedTransactionReference || "—"}</span>
+          </div>
+          <div>
+            <span className="text-[var(--color-charcoal)]/60">Verified Date:</span>
+            <span className="ml-1.5">{order.verifiedAt ? formatDate(order.verifiedAt) : formatDate(order.createdAt)}</span>
+          </div>
+        </div>
+        {order.verifiedByAdminEmail && (
+          <p className="mt-1.5 text-[11px] text-[var(--color-charcoal)]/60">
+            Verified by: {order.verifiedByAdminEmail}
+          </p>
+        )}
+      </div>
+
       {notice ? (
         <p role="status" className="mt-5 text-sm text-[var(--color-maroon)]">
           {notice}

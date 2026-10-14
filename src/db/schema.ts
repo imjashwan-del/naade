@@ -67,6 +67,10 @@ export const orders = pgTable("orders", {
   phonePeTransactionId: text("phone_pe_transaction_id"),
   whatsappNotifiedAt: timestamp("whatsapp_notified_at"),
   whatsappPhone: text("whatsapp_phone"),
+  paymentAttemptId: integer("payment_attempt_id"),
+  verifiedTransactionReference: text("verified_transaction_reference"),
+  verifiedAt: timestamp("verified_at"),
+  verifiedByAdminEmail: text("verified_by_admin_email"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -86,7 +90,6 @@ export const whatsappWebhookEvents = pgTable("whatsapp_webhook_events", {
 
 export type WhatsappWebhookEvent = typeof whatsappWebhookEvents.$inferSelect;
 export type NewWhatsappWebhookEvent = typeof whatsappWebhookEvents.$inferInsert;
-
 
 export type OrderItemMeasurements = {
   chest: string;
@@ -116,6 +119,79 @@ export const orderItems = pgTable("order_items", {
 
 export type OrderItem = typeof orderItems.$inferSelect;
 export type NewOrderItem = typeof orderItems.$inferInsert;
+
+export type PaymentAttemptStatus =
+  | "PENDING_VERIFICATION"
+  | "MANUALLY_VERIFIED"
+  | "REJECTED"
+  | "EXPIRED"
+  | "CANCELLED";
+
+export type PaymentAttemptItem = {
+  productId: number;
+  productName: string;
+  category: string;
+  price: number;
+  quantity: number;
+  size?: string | null;
+  isMadeToMeasure: boolean;
+  measurements?: OrderItemMeasurements | null;
+  imageUrl?: string;
+};
+
+export const paymentAttempts = pgTable("payment_attempts", {
+  id: serial("id").primaryKey(),
+  orderReference: text("order_reference").notNull().unique(),
+  customerName: text("customer_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  pincode: text("pincode").notNull(),
+  items: jsonb("items").$type<PaymentAttemptItem[]>().notNull().default([]),
+  subtotal: integer("subtotal").notNull(),
+  shipping: integer("shipping").notNull().default(0),
+  total: integer("total").notNull(),
+  currency: text("currency").notNull().default("INR"),
+  status: text("status").notNull().default("PENDING_VERIFICATION"),
+  customerUpiReference: text("customer_upi_reference"),
+  customerNote: text("customer_note"),
+  verifiedTransactionReference: text("verified_transaction_reference"),
+  verifiedAt: timestamp("verified_at"),
+  verifiedByAdminId: integer("verified_by_admin_id"),
+  verifiedByAdminEmail: text("verified_by_admin_email"),
+  orderId: integer("order_id"),
+  rejectionReason: text("rejection_reason"),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type PaymentAttempt = typeof paymentAttempts.$inferSelect;
+export type NewPaymentAttempt = typeof paymentAttempts.$inferInsert;
+
+export const paymentVerificationAuditLogs = pgTable(
+  "payment_verification_audit_logs",
+  {
+    id: serial("id").primaryKey(),
+    paymentAttemptId: integer("payment_attempt_id").notNull(),
+    orderReference: text("order_reference").notNull(),
+    adminId: integer("admin_id"),
+    adminEmail: text("admin_email").notNull(),
+    action: text("action").notNull(), // "VERIFIED_AND_CONFIRMED" | "REJECTED" | "CANCELLED"
+    verifiedTransactionReference: text("verified_transaction_reference"),
+    amount: integer("amount").notNull(),
+    notes: text("notes"),
+    ipAddress: text("ip_address"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+);
+
+export type PaymentVerificationAuditLog =
+  typeof paymentVerificationAuditLogs.$inferSelect;
+export type NewPaymentVerificationAuditLog =
+  typeof paymentVerificationAuditLogs.$inferInsert;
 
 export const adminUsers = pgTable("admin_users", {
   id: serial("id").primaryKey(),

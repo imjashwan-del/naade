@@ -73,6 +73,16 @@ export function AdminChrome({ children }: { children: ReactNode }) {
               >
                 Orders
               </Link>
+              <Link
+                href="/admin/pending-payments"
+                className={`text-xs font-semibold uppercase tracking-[0.1em] ${
+                  pathname?.startsWith("/admin/pending-payments")
+                    ? "text-[var(--color-charcoal)]"
+                    : "text-[var(--color-charcoal)]/50"
+                }`}
+              >
+                Pending Payments
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">

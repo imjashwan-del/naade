@@ -2,12 +2,13 @@
   "name": "nextjs-postgresql-template",
   "private": true,
   "scripts": {
-    "dev": "npm run admin:create && next dev",
+    "dev": "node scripts/migrate-upi-verification.cjs && npm run admin:create && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "admin:create": "node scripts/create-admin.cjs",
+    "migrate:upi": "node scripts/migrate-upi-verification.cjs",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push"
   },
