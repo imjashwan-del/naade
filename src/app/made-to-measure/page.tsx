@@ -26,23 +26,23 @@ export default async function MadeToMeasurePage() {
             </p>
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center gap-4">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             <Link
               href="/shop"
-              className="inline-flex items-center justify-center border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-8 py-3.5 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ivory)] transition-all hover:border-[var(--color-oxblood)] hover:bg-[var(--color-oxblood)]"
+              className="flex h-12 w-full sm:w-auto items-center justify-center border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-8 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ivory)] transition-all hover:border-[var(--color-oxblood)] hover:bg-[var(--color-oxblood)]"
             >
               {content.button || "Shop Made to Measure Pieces"} &rarr;
             </Link>
             <Link
               href="/size-guide"
-              className="font-serif text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]/75 underline underline-offset-4 hover:text-[var(--color-oxblood)]"
+              className="flex h-11 items-center justify-center font-serif text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]/75 underline underline-offset-4 hover:text-[var(--color-oxblood)]"
             >
               View Measurement Guide &rarr;
             </Link>
           </div>
         </div>
 
-        <div className="relative aspect-[4/5] overflow-hidden border border-[var(--color-line)] bg-[var(--color-parchment)] shadow-2xs">
+        <div className="relative aspect-[4/3] sm:aspect-[4/5] overflow-hidden border border-[var(--color-line)] bg-[var(--color-parchment)] shadow-2xs">
           <Image
             src="/images/heritage/artisan-loom.jpg"
             alt={content.imageAlt || "Tailoring NAADE Pochampally handloom garments"}

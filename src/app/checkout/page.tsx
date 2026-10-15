@@ -138,7 +138,7 @@ export default function CheckoutPage() {
         </p>
         <div className="mt-8">
           <Link
-            href="/shop"
+            href="/"
             className="inline-flex items-center justify-center border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-8 py-3.5 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ivory)] hover:bg-[var(--color-oxblood)]"
           >
             Explore Collection &rarr;
@@ -349,7 +349,7 @@ function Field({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="border border-[var(--color-line)] bg-white px-3.5 py-3 font-sans text-sm text-[var(--color-charcoal)] outline-none transition-colors focus:border-[var(--color-oxblood)]"
+        className="border border-[var(--color-line)] bg-white px-3.5 py-3 font-sans text-base sm:text-sm text-[var(--color-charcoal)] outline-none transition-colors focus:border-[var(--color-oxblood)]"
       />
       {error ? (
         <span className="text-[11px] text-[var(--color-oxblood)]">{error}</span>

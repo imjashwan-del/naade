@@ -77,7 +77,7 @@ export default async function ContactPage() {
               href="https://wa.me/918555909550"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-8 py-3.5 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ivory)] transition-all hover:border-[var(--color-oxblood)] hover:bg-[var(--color-oxblood)]"
+              className="flex h-12 w-full sm:w-auto sm:inline-flex items-center justify-center border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-8 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ivory)] transition-all hover:border-[var(--color-oxblood)] hover:bg-[var(--color-oxblood)]"
             >
               Message on WhatsApp &rarr;
             </a>

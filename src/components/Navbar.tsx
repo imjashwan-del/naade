@@ -28,10 +28,11 @@ export function Navbar({ content }: { content: SiteContentValues }) {
     content.announcementEnabled !== "false" && Boolean(content.announcementText);
 
   const navLinks = [
-    { href: "/", label: "HOME", exact: true },
-    { href: "/shop", label: "SHOP", exact: false },
-    { href: "/story", label: "OUR STORY", exact: false },
+    { href: "/", label: "THE COLLECTION", exact: true },
+    { href: "/shop?category=jacket", label: "JACKETS", exact: false },
+    { href: "/shop?category=shirt", label: "SHIRTS", exact: false },
     { href: "/made-to-measure", label: "CUSTOM ORDER", exact: false },
+    { href: "/story", label: "OUR STORY", exact: false },
     { href: "/contact", label: "CONTACT", exact: false },
   ];
 
@@ -49,15 +50,15 @@ export function Navbar({ content }: { content: SiteContentValues }) {
 
       {/* Main Heritage Header */}
       <header className="sticky top-0 z-40 border-b border-[var(--color-line)] bg-[var(--color-ivory)]/98 backdrop-blur-xs">
-        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-10">
+        <div className="mx-auto flex h-14 sm:h-16 lg:h-20 max-w-[1440px] items-center justify-between px-3.5 sm:px-6 lg:px-10">
           {/* Authentic Brand Wordmark with Pochampally Ikat Symbol */}
           <Link
             href="/"
-            className="group flex items-center gap-3.5 focus-visible:outline-none"
+            className="group flex items-center gap-2.5 sm:gap-3.5 focus-visible:outline-none"
             aria-label="NAADE Pochampally Handloom Homepage"
           >
             {/* Authentic Diamond Motif Icon */}
-            <div className="relative h-8 w-8 shrink-0 transition-transform duration-300 group-hover:scale-105">
+            <div className="relative h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 shrink-0 transition-transform duration-300 group-hover:scale-105">
               <Image
                 src="/images/heritage/ikat-motif.png"
                 alt=""
@@ -68,11 +69,11 @@ export function Navbar({ content }: { content: SiteContentValues }) {
             </div>
 
             <div className="flex flex-col">
-              <span className="font-serif-display text-2xl font-normal tracking-[0.14em] text-[var(--color-charcoal)] transition-colors group-hover:text-[var(--color-oxblood)] sm:text-[28px]">
+              <span className="font-serif-display text-xl sm:text-2xl lg:text-[28px] font-normal tracking-[0.14em] text-[var(--color-charcoal)] transition-colors group-hover:text-[var(--color-oxblood)]">
                 {content.brand || "NAADE"}
               </span>
-              <span className="font-serif text-[9px] font-medium tracking-[0.22em] text-[var(--color-charcoal)]/75 uppercase">
-                Pochampally Ikat &bull; Handloom &bull; India
+              <span className="hidden font-serif text-[8px] sm:text-[9px] font-medium tracking-[0.2em] text-[var(--color-charcoal)]/75 uppercase xs:block sm:block">
+                POCHAMPALLY IKAT &bull; HANDLOOM &bull; INDIA
               </span>
             </div>
           </Link>
@@ -104,13 +105,13 @@ export function Navbar({ content }: { content: SiteContentValues }) {
           </nav>
 
           {/* Right Action Icons: Search, Profile/Admin, Shopping Bag */}
-          <div className="flex items-center gap-5 sm:gap-7">
+          <div className="flex items-center gap-3 sm:gap-5 lg:gap-7">
             {/* Search Trigger */}
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search collection"
-              className="p-1 text-[var(--color-charcoal)]/80 transition-colors hover:text-[var(--color-oxblood)]"
+              className="flex h-9 w-9 items-center justify-center p-1 text-[var(--color-charcoal)]/80 transition-colors hover:text-[var(--color-oxblood)]"
             >
               <svg
                 className="h-[19px] w-[19px]"
@@ -127,11 +128,11 @@ export function Navbar({ content }: { content: SiteContentValues }) {
               </svg>
             </button>
 
-            {/* Profile / Admin Login Link */}
+            {/* Profile / Admin Login Link - visible on tablet/desktop, accessible via Mobile Drawer on phones */}
             <Link
               href="/admin/login"
               aria-label="Atelier Login & Account"
-              className="p-1 text-[var(--color-charcoal)]/80 transition-colors hover:text-[var(--color-oxblood)]"
+              className="hidden sm:flex h-9 w-9 items-center justify-center p-1 text-[var(--color-charcoal)]/80 transition-colors hover:text-[var(--color-oxblood)]"
             >
               <svg
                 className="h-[19px] w-[19px]"
@@ -152,7 +153,7 @@ export function Navbar({ content }: { content: SiteContentValues }) {
             <Link
               href="/cart"
               aria-label="View Shopping Bag"
-              className="group relative p-1 text-[var(--color-charcoal)]/85 transition-colors hover:text-[var(--color-oxblood)]"
+              className="group relative flex h-9 w-9 items-center justify-center p-1 text-[var(--color-charcoal)]/85 transition-colors hover:text-[var(--color-oxblood)]"
             >
               <svg
                 className="h-[21px] w-[21px]"
@@ -168,7 +169,7 @@ export function Navbar({ content }: { content: SiteContentValues }) {
                 />
               </svg>
               {/* Badge Counter */}
-              <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-oxblood)] px-1 font-serif text-[10px] font-bold text-[#f5efe6] shadow-xs">
+              <span className="absolute -right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-oxblood)] px-1 font-serif text-[10px] font-bold text-[#f5efe6] shadow-xs">
                 {isLoaded ? itemCount : 0}
               </span>
             </Link>
@@ -178,7 +179,7 @@ export function Navbar({ content }: { content: SiteContentValues }) {
               type="button"
               onClick={() => setMenuOpen(true)}
               aria-label="Open navigation menu"
-              className="flex h-9 w-9 items-center justify-center border border-[var(--color-line)] text-[var(--color-charcoal)] lg:hidden"
+              className="flex h-9 w-9 items-center justify-center border border-[var(--color-line)] text-[var(--color-charcoal)] transition-colors hover:border-[var(--color-oxblood)] hover:text-[var(--color-oxblood)] lg:hidden"
             >
               <svg
                 className="h-5 w-5"

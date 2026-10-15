@@ -32,7 +32,7 @@ export default function CartPage() {
         </p>
         <div className="mt-8">
           <Link
-            href="/shop"
+            href="/"
             className="inline-flex items-center justify-center border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-8 py-3.5 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ivory)] transition-all hover:border-[var(--color-oxblood)] hover:bg-[var(--color-oxblood)]"
           >
             Explore The Collection &rarr;

@@ -41,7 +41,7 @@ export default async function StoryPage() {
 
       {/* Featured Archival Photograph */}
       <section className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-        <div className="relative aspect-[16/9] w-full overflow-hidden border border-[var(--color-line)] bg-[var(--color-charcoal)] shadow-sm sm:aspect-[21/9]">
+        <div className="relative aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9] w-full overflow-hidden border border-[var(--color-line)] bg-[var(--color-charcoal)] shadow-sm">
           <Image
             src="/images/heritage/artisan-loom.jpg"
             alt="Pochampally artisan hand-weaving on a wooden pit loom"
@@ -50,8 +50,8 @@ export default async function StoryPage() {
             sizes="100vw"
             className="object-cover grayscale contrast-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-          <div className="absolute bottom-4 left-4 font-serif text-xs tracking-wider text-[#f5efe6]/90 sm:bottom-6 sm:left-6">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+          <div className="absolute bottom-3 left-3 right-3 font-serif text-[10px] sm:text-xs tracking-wider text-[#f5efe6]/90 sm:bottom-6 sm:left-6 sm:right-auto">
             Master Weaver at Pit Loom &bull; Pochampally Cluster, Telangana &bull; Traditional Tie-Dye Handloom
           </div>
         </div>

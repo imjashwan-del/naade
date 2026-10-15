@@ -453,12 +453,12 @@ export default function OrderStatusPage({
                     value={referenceInput}
                     onChange={(e) => setReferenceInput(e.target.value)}
                     placeholder="Enter UPI UTR / Transaction ID (e.g. 4289...)"
-                    className="flex-1 border border-[var(--color-charcoal)]/25 px-3 py-2 text-sm font-mono outline-none focus:border-[var(--color-charcoal)]"
+                    className="flex-1 border border-[var(--color-charcoal)]/25 px-3.5 py-2.5 text-base sm:text-sm font-mono outline-none focus:border-[var(--color-charcoal)]"
                   />
                   <button
                     type="submit"
                     disabled={submittingRef || !referenceInput.trim()}
-                    className="border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--color-ivory)] hover:bg-black disabled:opacity-50"
+                    className="flex h-11 sm:h-auto items-center justify-center border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--color-ivory)] hover:bg-black disabled:opacity-50"
                   >
                     {submittingRef ? "Saving…" : "Save Reference"}
                   </button>

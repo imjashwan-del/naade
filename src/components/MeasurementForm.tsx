@@ -38,7 +38,7 @@ export function MeasurementForm({
                 step={0.1}
                 value={values[field.key]}
                 onChange={(e) => onChange(field.key, e.target.value)}
-                className="w-full bg-transparent px-3 py-2.5 text-sm text-[var(--color-charcoal)] outline-none"
+                className="w-full bg-transparent px-3 py-2.5 text-base sm:text-sm text-[var(--color-charcoal)] outline-none"
                 aria-label={`${field.label} in inches`}
               />
               <span className="pr-3 text-[11px] uppercase text-[var(--color-charcoal)]/45">in</span>

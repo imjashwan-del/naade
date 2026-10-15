@@ -94,11 +94,11 @@ export function Footer({ content }: { content: SiteContentValues }) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email address"
                   required
-                  className="w-full min-w-0 border border-[#dfd6c7]/30 bg-black/40 px-4 py-2.5 text-xs text-[#f5efe6] placeholder-[#dfd6c7]/50 outline-none transition-colors focus:border-[#dfd6c7] sm:max-w-xs"
+                  className="h-11 w-full min-w-0 border border-[#dfd6c7]/30 bg-black/40 px-4 py-2 text-base sm:text-xs text-[#f5efe6] placeholder-[#dfd6c7]/50 outline-none transition-colors focus:border-[#dfd6c7] sm:max-w-xs"
                 />
                 <button
                   type="submit"
-                  className="border border-[#742226] bg-[var(--color-oxblood)] px-6 py-2.5 font-serif text-[11px] font-semibold uppercase tracking-[0.16em] text-[#f5efe6] transition-all hover:bg-[#7a2428] hover:shadow-sm"
+                  className="flex h-11 w-full sm:w-auto items-center justify-center border border-[#742226] bg-[var(--color-oxblood)] px-6 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[#f5efe6] transition-all hover:bg-[#7a2428] hover:shadow-sm active:scale-[0.99]"
                 >
                   Subscribe
                 </button>

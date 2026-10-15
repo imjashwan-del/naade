@@ -24,7 +24,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
         href={`/product/${item.slug}`}
         className="relative h-28 w-24 shrink-0 overflow-hidden border border-[var(--color-line)] bg-[var(--color-parchment)] sm:h-36 sm:w-28"
       >
-        <Image src={item.imageUrl} alt={item.name} fill sizes="140px" className="object-cover" />
+        <Image src={item.imageUrl} alt={item.name} fill sizes="140px" className="object-contain p-1" />
       </Link>
 
       <div className="flex flex-1 flex-col justify-between">
@@ -49,7 +49,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
               )}
             </div>
             {item.isMadeToMeasure && item.measurements ? (
-              <dl className="mt-2 grid grid-cols-3 gap-x-3 gap-y-1 font-serif text-[11px] text-[var(--color-charcoal)]/70">
+              <dl className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-x-3 gap-y-1 font-serif text-[11px] text-[var(--color-charcoal)]/70">
                 {MEASUREMENT_LABELS.map((m) => (
                   <div key={m.key} className="flex gap-1">
                     <dt className="font-medium text-[var(--color-charcoal)]/60">{m.label}:</dt>

@@ -43,10 +43,10 @@ export function ProductCard({
         ) : null}
 
         {/* Vintage Badges */}
-        <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1 sm:left-3 sm:top-3">
+        <div className="absolute left-2 top-2 flex flex-col items-start gap-1 sm:left-3 sm:top-3">
           {product.isNewArrival && <Badge tone="oxblood">NEW</Badge>}
           {product.customMeasurementsEnabled && (
-            <span className="border border-[var(--color-charcoal)]/40 bg-[var(--color-ivory)]/95 px-2 py-0.5 font-serif text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)] backdrop-blur-xs">
+            <span className="border border-[var(--color-charcoal)]/40 bg-[var(--color-ivory)]/95 px-1.5 py-0.5 font-serif text-[7.5px] sm:text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--color-charcoal)] backdrop-blur-xs">
               Custom Fit
             </span>
           )}
@@ -54,21 +54,40 @@ export function ProductCard({
 
         {isSoldOut && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px]">
-            <span className="border border-white/40 bg-black/85 px-3 py-1 font-serif text-[11px] font-semibold uppercase tracking-widest text-white">
-              Archived / Sold Out
+            <span className="border border-white/40 bg-black/85 px-2.5 py-1 font-serif text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-white text-center">
+              Archived
             </span>
           </div>
         )}
       </div>
 
       {/* Product Details - Authentic Editorial Typography */}
-      <div className="mt-3.5 flex flex-col items-start">
-        <h3 className="font-serif-display text-[15px] font-medium tracking-[0.02em] text-[var(--color-charcoal)] transition-colors group-hover:text-[var(--color-oxblood)]">
-          {product.name}
-        </h3>
-        <p className="mt-1 font-serif text-sm font-medium tracking-[0.02em] text-[var(--color-charcoal)]/90">
-          {formatPrice(product.price)}
-        </p>
+      <div className="mt-2.5 sm:mt-3 flex flex-1 flex-col justify-between">
+        <div>
+          <h3 className="font-serif-display text-[13px] sm:text-[15px] font-medium leading-snug tracking-[0.02em] text-[var(--color-charcoal)] transition-colors group-hover:text-[var(--color-oxblood)]">
+            {product.name}
+          </h3>
+          <p className="mt-1 font-serif text-xs sm:text-sm font-semibold tracking-[0.02em] text-[var(--color-charcoal)]/90">
+            {formatPrice(product.price)}
+          </p>
+        </div>
+
+        {/* Direct Action Button */}
+        <div className="mt-3 w-full">
+          {isSoldOut ? (
+            <span className="flex h-9 sm:h-10 w-full items-center justify-center border border-[var(--color-line)] bg-[var(--color-cotton)]/40 font-serif text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]/40 cursor-not-allowed">
+              Archived
+            </span>
+          ) : product.customMeasurementsEnabled ? (
+            <span className="flex h-9 sm:h-10 w-full items-center justify-center border border-[var(--color-charcoal)] bg-transparent font-serif text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)] transition-all group-hover:border-[var(--color-oxblood)] group-hover:bg-[var(--color-oxblood)] group-hover:text-[#f5efe6]">
+              Custom Fit &bull; Select Size &rarr;
+            </span>
+          ) : (
+            <span className="flex h-9 sm:h-10 w-full items-center justify-center border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] font-serif text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-ivory)] transition-all group-hover:border-[var(--color-oxblood)] group-hover:bg-[var(--color-oxblood)]">
+              Select Size &bull; Order &rarr;
+            </span>
+          )}
+        </div>
       </div>
     </Link>
   );
