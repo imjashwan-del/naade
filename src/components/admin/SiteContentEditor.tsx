@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -10,6 +10,15 @@ import {
 } from "@/lib/site-content";
 
 type SiteContentData = Record<SiteContentPageId, SiteContentValues>;
+
+type StorageStatus = {
+  configured: boolean;
+  hasUrl: boolean;
+  hasServiceRoleKey: boolean;
+  bucket: string;
+  status: string;
+  message: string;
+};
 
 export function SiteContentEditor({
   initialValues,
@@ -23,6 +32,20 @@ export function SiteContentEditor({
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [storageStatus, setStorageStatus] = useState<StorageStatus | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/admin/storage-status")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: StorageStatus | null) => {
+        if (active && data) setStorageStatus(data);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const page = SITE_CONTENT_PAGES.find((item) => item.id === selectedPage)!;
   const previewPath =
@@ -146,6 +169,26 @@ export function SiteContentEditor({
       </div>
 
       <form onSubmit={handleSubmit}>
+        {storageStatus && !storageStatus.configured && page.fields.some((f) => f.type === "image") && (
+          <div className="mx-5 mt-5 rounded border border-amber-300 bg-amber-50/90 p-3.5 text-xs text-amber-950 sm:mx-6">
+            <div className="flex items-start gap-2.5">
+              <span className="text-sm">⚠️</span>
+              <div className="space-y-1">
+                <p className="font-semibold text-amber-900">
+                  Image Uploads Require Server Configuration
+                </p>
+                <p className="leading-relaxed text-amber-800">
+                  Direct image uploads require{" "}
+                  <code className="rounded bg-amber-100 px-1 py-0.5 font-mono text-[11px] font-semibold text-amber-900">
+                    SUPABASE_SERVICE_ROLE_KEY
+                  </code>{" "}
+                  in your server environment settings (.env.local or Vercel). You can also paste an image path or external URL directly into the field.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid gap-x-8 gap-y-6 p-5 sm:grid-cols-2 sm:p-6">
           {page.fields.map((field) => {
             const currentValue = values[selectedPage]?.[field.key] ?? "";

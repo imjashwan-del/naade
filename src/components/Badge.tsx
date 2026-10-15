@@ -1,11 +1,21 @@
-export function Badge({ children, tone = "dark" }: { children: string; tone?: "dark" | "light" }) {
+export function Badge({
+  children,
+  tone = "oxblood",
+}: {
+  children: string;
+  tone?: "oxblood" | "dark" | "light";
+}) {
+  let toneClass = "bg-[var(--color-oxblood)] text-[#f5efe6] border border-[#742226]";
+
+  if (tone === "dark") {
+    toneClass = "bg-[var(--color-charcoal)] text-[var(--color-ivory)] border border-[var(--color-charcoal)]";
+  } else if (tone === "light") {
+    toneClass = "bg-[var(--color-ivory)] text-[var(--color-charcoal)] border border-[var(--color-line)]";
+  }
+
   return (
     <span
-      className={`inline-block px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${
-        tone === "dark"
-          ? "bg-[var(--color-charcoal)] text-[var(--color-ivory)]"
-          : "bg-[var(--color-ivory)] text-[var(--color-charcoal)] border border-[var(--color-charcoal)]/20"
-      }`}
+      className={`inline-block px-2.5 py-0.5 font-serif text-[9px] font-semibold uppercase tracking-[0.2em] shadow-xs ${toneClass}`}
     >
       {children}
     </span>

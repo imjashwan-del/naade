@@ -9,341 +9,366 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const content = await getSiteContent("home");
   const allProducts = await getActiveProducts();
-  
-  // Featured products from database / fallback
-  const featuredProducts = allProducts.filter((p) => p.isFeatured).slice(0, 4);
-  const displayProducts = featuredProducts.length > 0 ? featuredProducts : allProducts.slice(0, 4);
 
-  const heroImageSrc = content.heroImage?.trim() || "/images/hero.jpg";
+  // Featured pieces from database
+  const featured = allProducts.filter((p) => p.isFeatured).slice(0, 4);
+  const displayProducts = featured.length > 0 ? featured : allProducts.slice(0, 4);
 
   return (
-    <main className="flex flex-col">
-      {/* 1. Hero Section: Authentic Heritage Editorial */}
-      <section className="relative overflow-hidden border-b border-[var(--color-line)] bg-[var(--color-ivory)]">
-        <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:px-10 lg:py-24">
-          {/* Left Hero Narrative */}
-          <div className="flex flex-col items-start">
-            <div className="flex items-center gap-2.5">
-              <span className="h-px w-6 bg-[var(--color-maroon)]" />
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-maroon)]">
-                {content.heroEyebrow || "POCHAMPALLY IKAT • TELANGANA"}
-              </p>
-            </div>
-
-            <h1 className="mt-5 font-serif-display text-[clamp(2.4rem,5vw,4.2rem)] font-normal leading-[1.08] tracking-[-0.01em] text-[var(--color-charcoal)]">
-              {(content.heroTitle || "Contemporary Ikat\nfrom Pochampally")
-                .split("\n")
-                .map((line, i) => (
-                  <span key={i} className="block">
-                    {line}
-                  </span>
-                ))}
-            </h1>
-
-            <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[var(--color-charcoal)]/80 sm:text-base">
-              {content.heroDescription ||
-                "Handcrafted luxury menswear rooted in the centuries-old weaving heritage of Pochampally. Every jacket and shirt is tailored from authentic resist-dyed cottons, woven one thread at a time on traditional Indian pit looms."}
-            </p>
-
-            {/* CTAs */}
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <Link
-                href="/shop?category=jacket"
-                className="inline-flex items-center justify-center rounded-xs bg-[var(--color-charcoal)] px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ivory)] shadow-xs transition-all hover:bg-black hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-charcoal)]"
-              >
-                {content.heroJacketsButton || "Explore Jackets"} →
-              </Link>
-              <Link
-                href="/shop?category=shirt"
-                className="inline-flex items-center justify-center rounded-xs border border-[var(--color-charcoal)]/30 bg-transparent px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)] transition-colors hover:border-[var(--color-charcoal)] hover:bg-[var(--color-cotton)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-charcoal)]"
-              >
-                {content.heroShirtsButton || "Explore Shirts"}
-              </Link>
-            </div>
-
-            {/* Micro Badge */}
-            <div className="mt-10 flex items-center gap-4 border-t border-[var(--color-line)] pt-6 text-xs text-[var(--color-charcoal)]/65">
-              <div className="flex items-center gap-1.5 font-medium">
-                <span className="text-[var(--color-maroon)]">◈</span>
-                <span>Geographical Indication (GI) Certified Handloom</span>
+    <main className="flex flex-col bg-[var(--color-ivory)]">
+      {/* =========================================================================
+          1. HERO SECTION: AUTHENTIC 1990s POCHAMPALLY EDITORIAL (VISUAL REFERENCE)
+         ========================================================================= */}
+      <section className="relative border-b border-[var(--color-line)] bg-[var(--color-ivory)] overflow-hidden">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="grid grid-cols-1 items-stretch lg:grid-cols-[44px_1.1fr_1.1fr_110px]">
+            {/* Left Column: Antique Botanical Block-Print Border (Mockup Left Border) */}
+            <div className="relative hidden overflow-hidden border-r border-[var(--color-line)] bg-[var(--color-parchment)] lg:block">
+              <div className="absolute inset-0 opacity-80 mix-blend-multiply">
+                <Image
+                  src="/images/heritage/botanical-border.jpg"
+                  alt=""
+                  aria-hidden
+                  fill
+                  className="object-cover object-top"
+                />
               </div>
-              <span className="text-[var(--color-line)]">•</span>
-              <div>Atelier Direct</div>
             </div>
-          </div>
 
-          {/* Right Hero Image Card */}
-          <div className="relative">
-            <div className="relative mx-auto aspect-[4/5] w-full max-w-[540px] overflow-hidden rounded-xs border border-[var(--color-line)] bg-[var(--color-offwhite)] shadow-sm">
+            {/* Center-Left Narrative: Editorial Headlines & Story CTA */}
+            <div className="flex flex-col justify-center px-6 py-12 sm:px-10 sm:py-16 lg:px-14 lg:py-20">
+              <div className="flex items-center gap-2.5">
+                <span className="h-px w-5 bg-[var(--color-oxblood)]" />
+                <p className="font-serif text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--color-oxblood)]">
+                  {content.heroEyebrow || "POCHAMPALLY IKAT • TELANGANA"}
+                </p>
+                <span className="font-telugu text-[11px] text-[var(--color-turmeric)]">
+                  పోచంపల్లి
+                </span>
+              </div>
+
+              {/* Major 90s Telugu Handloom Editorial Headline */}
+              <h1 className="mt-6 font-serif-display text-[clamp(2.5rem,5.2vw,4.5rem)] font-normal uppercase leading-[1.04] tracking-[0.03em] text-[var(--color-oxblood)]">
+                WOVEN<br />
+                IN TRADITION.<br />
+                <span className="text-[var(--color-oxblood)]">MADE FOR</span><br />
+                <span className="text-[var(--color-oxblood)]">TOMORROW.</span>
+              </h1>
+
+              <p className="mt-7 max-w-md font-serif text-[15px] leading-relaxed text-[var(--color-charcoal)]/85 sm:text-[16px]">
+                {content.heroDescription ||
+                  "NAADE brings the timeless art of Pochampally Ikat into contemporary menswear — where heritage meets everyday elegance."}
+              </p>
+
+              {/* Vintage Handloom Catalogue Action */}
+              <div className="mt-10 flex flex-wrap items-center gap-4">
+                <Link
+                  href="/shop"
+                  className="inline-flex items-center justify-center border border-[var(--color-charcoal)] bg-transparent px-8 py-3.5 font-serif text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-charcoal)] transition-all hover:border-[var(--color-oxblood)] hover:bg-[var(--color-oxblood)] hover:text-[#f5efe6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-oxblood)]"
+                >
+                  EXPLORE THE COLLECTION &rarr;
+                </Link>
+                <Link
+                  href="/story"
+                  className="font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-charcoal)]/75 underline underline-offset-4 transition-colors hover:text-[var(--color-oxblood)]"
+                >
+                  Our Heritage &rarr;
+                </Link>
+              </div>
+
+              {/* Small Archive Tag Note */}
+              <div className="mt-12 flex items-center gap-3 border-t border-[var(--color-line)] pt-5 text-[11px] font-serif tracking-[0.1em] text-[var(--color-charcoal)]/65">
+                <span className="text-[var(--color-oxblood)] font-bold">&#9670;</span>
+                <span>Geographical Indication (GI) Certified Pit-Loom Weave</span>
+                <span>&bull;</span>
+                <span>Telangana Archive</span>
+              </div>
+            </div>
+
+            {/* Center-Right Hero Photograph (Authentic Pochampally Ikat Jacket Menswear) */}
+            <div className="relative min-h-[380px] sm:min-h-[480px] lg:min-h-full border-t border-b lg:border-t-0 lg:border-b-0 border-[var(--color-line)] bg-[var(--color-parchment)]">
               <Image
-                src={heroImageSrc}
-                alt={content.heroImageAlt || "NAADE contemporary handloom Ikat jacket crafted in Pochampally"}
+                src="/images/heritage/hero-man.jpg"
+                alt="Man wearing authentic NAADE Pochampally Ikat jacket in Telangana heritage courtyard"
                 fill
                 priority
-                sizes="(max-width: 1024px) 100vw, 540px"
+                sizes="(max-width: 1024px) 100vw, 45vw"
                 className="object-cover object-top"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
-              <div className="absolute bottom-5 left-5 right-5 text-white">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--color-ivory)]/90">
-                  The Pochampally Edit
-                </p>
-                <p className="mt-1 font-serif-display text-lg tracking-[0.02em]">
-                  Mathematical Resist-Dye &amp; Tailored Silhouettes
-                </p>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-40" />
             </div>
 
-            {/* Subtle decorative offset border frame */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -bottom-3 -right-3 hidden h-full w-full rounded-xs border border-[var(--color-maroon)]/30 lg:block -z-10"
-            />
+            {/* Right Column: Authentic Pochampally Ikat Textile Swatch Strip (Mockup Right Border) */}
+            <div className="relative hidden overflow-hidden border-l border-[var(--color-line)] bg-[#1a1715] lg:block">
+              <Image
+                src="/images/heritage/ikat-vertical-swatch.jpg"
+                alt="Authentic Pochampally Ikat textile swatch texture"
+                fill
+                priority
+                sizes="110px"
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Artisanal Trust Pillars */}
-      <section className="border-b border-[var(--color-line)] bg-[var(--color-cotton)]/40 py-10 sm:py-12">
+      {/* =========================================================================
+          2. ROOTED IN POCHAMPALLY: DOCUMENTARY ARCHIVE & CRAFTSMANSHIP
+         ========================================================================= */}
+      <section className="border-b border-[var(--color-line)] bg-[var(--color-ivory)] py-14 sm:py-20">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-            <div className="border-l-2 border-[var(--color-maroon)] pl-4">
-              <p className="font-serif-display text-sm font-semibold tracking-[0.02em] text-[var(--color-charcoal)] sm:text-base">
-                {content.trust1Title || "Pochampally GI Cluster"}
-              </p>
-              <p className="mt-1.5 text-xs leading-relaxed text-[var(--color-charcoal)]/70">
-                {content.trust1Copy || "Handwoven in Telangana with authentic resist-dyed yarns."}
-              </p>
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_1.5fr_0.8fr_0.8fr] lg:gap-10">
+            {/* 1. Black & White Documentary Photograph of Master Weaver at Pit Loom */}
+            <div className="relative aspect-[4/3] w-full overflow-hidden border border-[var(--color-line)] bg-[var(--color-cotton)] shadow-2xs">
+              <Image
+                src="/images/heritage/artisan-loom.jpg"
+                alt="Master artisan at traditional wooden pit loom in Pochampally, Telangana"
+                fill
+                sizes="(max-width: 1024px) 100vw, 320px"
+                className="object-cover grayscale contrast-110"
+              />
             </div>
-            <div className="border-l-2 border-[var(--color-maroon)] pl-4">
-              <p className="font-serif-display text-sm font-semibold tracking-[0.02em] text-[var(--color-charcoal)] sm:text-base">
-                {content.trust2Title || "Bespoke Measurements"}
-              </p>
-              <p className="mt-1.5 text-xs leading-relaxed text-[var(--color-charcoal)]/70">
-                {content.trust2Copy || "Custom tailored from individual cloth lengths at no extra cost."}
-              </p>
-            </div>
-            <div className="border-l-2 border-[var(--color-maroon)] pl-4">
-              <p className="font-serif-display text-sm font-semibold tracking-[0.02em] text-[var(--color-charcoal)] sm:text-base">
-                {content.trust3Title || "100% Handloom Cottons"}
-              </p>
-              <p className="mt-1.5 text-xs leading-relaxed text-[var(--color-charcoal)]/70">
-                {content.trust3Copy || "Breathable natural fibers woven on traditional pit looms."}
-              </p>
-            </div>
-            <div className="border-l-2 border-[var(--color-maroon)] pl-4">
-              <p className="font-serif-display text-sm font-semibold tracking-[0.02em] text-[var(--color-charcoal)] sm:text-base">
-                {content.trust4Title || "Direct Studio Model"}
-              </p>
-              <p className="mt-1.5 text-xs leading-relaxed text-[var(--color-charcoal)]/70">
-                {content.trust4Copy || "Connected directly to master artisans and weaving families."}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* 3. Featured Collection Section */}
-      <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24">
-        <div className="flex flex-col justify-between gap-4 border-b border-[var(--color-line)] pb-6 sm:flex-row sm:items-end">
-          <div>
-            <div className="flex items-center gap-2 text-[var(--color-maroon)]">
-              <span className="inline-block h-1 w-1 rotate-45 bg-current" />
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em]">
-                {content.featuredEyebrow || "The Edit"}
-              </p>
-            </div>
-            <h2 className="mt-2 font-serif-display text-3xl text-[var(--color-charcoal)] sm:text-4xl">
-              {content.featuredTitle || "Featured Pieces"}
-            </h2>
-            <p className="mt-2 text-sm text-[var(--color-charcoal)]/70">
-              {content.featuredCopy || "Contemporary silhouettes. Traditional weave. Made in Pochampally."}
-            </p>
-          </div>
-          <Link
-            href="/shop"
-            className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)] underline underline-offset-4 hover:text-[var(--color-maroon)] transition-colors"
-          >
-            {content.viewAllButton || "View All Products"} →
-          </Link>
-        </div>
-
-        <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12 md:grid-cols-3 lg:grid-cols-4">
-          {displayProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </section>
-
-      {/* 4. Category Showcase: Jackets vs Shirts */}
-      <section className="border-t border-b border-[var(--color-line)] bg-[var(--color-cotton)]/30 py-16 sm:py-20">
-        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
-          <div className="text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--color-maroon)]">
-              Curated Disciplines
-            </p>
-            <h2 className="mt-2 font-serif-display text-2xl text-[var(--color-charcoal)] sm:text-3xl">
-              Jackets &amp; Shirts in Pochampally Handloom
-            </h2>
-          </div>
-
-          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:gap-12">
-            {/* Category 1: Jackets */}
-            <Link
-              href="/shop?category=jacket"
-              className="group relative overflow-hidden rounded-xs border border-[var(--color-line)] bg-[var(--color-ivory)] transition-all hover:border-[var(--color-charcoal)]/40 shadow-xs"
-            >
-              <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-offwhite)]">
-                <Image
-                  src={content.jacketsImage || "/images/category-jackets.jpg"}
-                  alt="NAADE Pochampally Ikat Jackets"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 text-white">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--color-ivory)]">
-                    Structure &amp; Form
-                  </span>
-                  <h3 className="mt-1 font-serif-display text-2xl font-normal">
-                    {content.jacketsTitle || "Handloom Jackets"}
-                  </h3>
-                  <p className="mt-1 text-xs text-white/85 line-clamp-2">
-                    {content.jacketsCopy || "Tailored Nehru and single-breasted jackets woven from mathematical Ikat."}
-                  </p>
-                </div>
+            {/* 2. Editorial Story Narrative */}
+            <div className="flex flex-col items-start">
+              <div className="flex items-center gap-2">
+                <h2 className="font-serif-display text-xl sm:text-2xl font-normal uppercase tracking-[0.14em] text-[var(--color-oxblood)]">
+                  ROOTED IN POCHAMPALLY
+                </h2>
               </div>
-              <div className="flex items-center justify-between px-6 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-charcoal)]">
-                <span>Explore Collection</span>
-                <span className="transition-transform group-hover:translate-x-1">→</span>
-              </div>
-            </Link>
-
-            {/* Category 2: Shirts */}
-            <Link
-              href="/shop?category=shirt"
-              className="group relative overflow-hidden rounded-xs border border-[var(--color-line)] bg-[var(--color-ivory)] transition-all hover:border-[var(--color-charcoal)]/40 shadow-xs"
-            >
-              <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-offwhite)]">
-                <Image
-                  src={content.shirtsImage || "/images/category-shirts.jpg"}
-                  alt="NAADE Pochampally Handloom Shirts"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 text-white">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--color-ivory)]">
-                    Relaxed Everyday Luxury
-                  </span>
-                  <h3 className="mt-1 font-serif-display text-2xl font-normal">
-                    {content.shirtsTitle || "Handloom Shirts"}
-                  </h3>
-                  <p className="mt-1 text-xs text-white/85 line-clamp-2">
-                    {content.shirtsCopy || "Pure cotton shirts woven on pit looms, cut for contemporary comfort."}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between px-6 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-charcoal)]">
-                <span>Explore Collection</span>
-                <span className="transition-transform group-hover:translate-x-1">→</span>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Craft Story: "The Architecture of Ikat" */}
-      <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24">
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-xs border border-[var(--color-line)] bg-[var(--color-offwhite)]">
-            <Image
-              src={content.weaveImage || "/images/weave-texture.jpg"}
-              alt={content.weaveImageAlt || "Detail of authentic handloom Pochampally Ikat weave"}
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-maroon)]">
-              {content.weaveEyebrow || "Craft & Geometry"}
-            </p>
-            <h2 className="mt-3 font-serif-display text-3xl text-[var(--color-charcoal)] sm:text-4xl">
-              {content.weaveTitle || "The Architecture of Ikat"}
-            </h2>
-            <p className="mt-5 text-sm leading-relaxed text-[var(--color-charcoal)]/80 sm:text-base">
-              {content.weaveCopy ||
-                "Pochampally Ikat is created by resist-dyeing yarns before weaving, allowing the pattern to emerge through the structure of the cloth itself. The calculated geometry requires weeks of mathematical tying and precision handloom weaving."}
-            </p>
-            <p className="mt-4 text-sm leading-relaxed text-[var(--color-charcoal)]/75">
-              Unlike industrial print fashion where patterns are stamped onto prefabricated textiles, every single meter of NAADE cloth is born on traditional wooden looms in Telangana. The softened geometric lines are the hallmark of authentic human handcraft.
-            </p>
-            <div className="mt-8">
-              <Link
-                href="/story"
-                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)] underline underline-offset-4 hover:text-[var(--color-maroon)]"
-              >
-                Read our Pochampally story →
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Made to Measure Atelier Highlight */}
-      <section className="border-t border-[var(--color-line)] bg-[var(--color-offwhite)]/60 py-16 sm:py-20">
-        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-maroon)]">
-                {content.measureEyebrow || "Personal Fit"}
-              </p>
-              <h2 className="mt-3 font-serif-display text-3xl text-[var(--color-charcoal)] sm:text-4xl">
-                {content.measureTitle || "Your Fit. Your NAADE."}
-              </h2>
-              <p className="mt-5 text-sm leading-relaxed text-[var(--color-charcoal)]/80 sm:text-base">
-                {content.measureCopy ||
-                  "Selected NAADE pieces can be cut to your individual measurements. We believe handwoven clothing should fit with quiet confidence."}
+              <p className="mt-1 font-telugu text-xs text-[var(--color-turmeric)] tracking-wide">
+                పోచంపల్లి చేనేత వారసత్వం
               </p>
 
-              <ul className="mt-6 space-y-3 text-xs text-[var(--color-charcoal)]/80">
-                <li className="flex items-center gap-2">
-                  <span className="text-[var(--color-maroon)] font-bold">✓</span>
-                  <span>Input chest, waist, shoulder, sleeve &amp; garment length directly at checkout.</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-[var(--color-maroon)] font-bold">✓</span>
-                  <span>Handcrafted individually by our master tailor in Pochampally.</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-[var(--color-maroon)] font-bold">✓</span>
-                  <span>No surcharge for custom bespoke sizing.</span>
-                </li>
-              </ul>
+              <p className="mt-4 font-serif text-[14px] sm:text-[15px] leading-relaxed text-[var(--color-charcoal)]/85">
+                From the looms of Pochampally, Telangana, comes a legacy of precision, patience and pattern. At NAADE, we work with skilled artisans to create modern silhouettes in authentic Ikat &mdash; keeping a centuries-old tradition alive, one weave at a time.
+              </p>
 
-              <div className="mt-8">
+              <div className="mt-6">
                 <Link
-                  href="/made-to-measure"
-                  className="inline-flex items-center justify-center rounded-xs bg-[var(--color-charcoal)] px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ivory)] transition-colors hover:bg-black"
+                  href="/story"
+                  className="font-serif text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-charcoal)] underline underline-offset-4 transition-colors hover:text-[var(--color-oxblood)]"
                 >
-                  {content.measureButton || "Explore Made to Measure"} →
+                  OUR STORY &rarr;
                 </Link>
               </div>
             </div>
 
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xs border border-[var(--color-line)] bg-white shadow-xs">
+            {/* 3. Authentic Handloom Ikat Diamond Motif Symbol */}
+            <div className="flex items-center justify-center py-4 lg:py-0">
+              <div className="relative h-28 w-24">
+                <Image
+                  src="/images/heritage/ikat-motif.png"
+                  alt="Traditional Pochampally Ikat diamond motif"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
+            {/* 4. Heritage Pillars (Mockup Right Pillars) */}
+            <div className="flex flex-col justify-center space-y-4 border-t lg:border-t-0 lg:border-l border-[var(--color-line)] pt-6 lg:pt-0 lg:pl-8">
+              <div className="font-serif text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-charcoal)]/80">
+                HANDLOOM
+              </div>
+              <div className="font-serif text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-charcoal)]/80">
+                HERITAGE
+              </div>
+              <div className="font-serif text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-charcoal)]/80">
+                CRAFTSMANSHIP
+              </div>
+              <div className="font-serif text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-charcoal)]/80">
+                SUSTAINABILITY
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          3. FEATURED PIECES: THE 1990s HANDLOOM CATALOGUE (VISUAL REFERENCE)
+         ========================================================================= */}
+      <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-10 lg:py-24">
+        {/* Section Heading & View All Link */}
+        <div className="flex items-end justify-between border-b border-[var(--color-line)] pb-5">
+          <div className="flex items-baseline gap-3">
+            <h2 className="font-serif-display text-xl sm:text-2xl font-normal uppercase tracking-[0.2em] text-[var(--color-charcoal)]">
+              FEATURED PIECES
+            </h2>
+          </div>
+          <Link
+            href="/shop"
+            className="font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-charcoal)] transition-colors hover:text-[var(--color-oxblood)]"
+          >
+            VIEW ALL &rarr;
+          </Link>
+        </div>
+
+        {/* 5-Column Grid: 4 Real Products + 1 Vintage Catalogue Card */}
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-5">
+          {displayProducts.map((product, idx) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              priority={idx < 2}
+            />
+          ))}
+
+          {/* 5th Column: Authentic Heritage Catalogue Card (Visual Reference Stamp) */}
+          <div className="col-span-2 sm:col-span-1 flex flex-col justify-between overflow-hidden border border-[var(--color-line)] bg-[var(--color-parchment)] p-4 shadow-2xs">
+            <div className="relative aspect-[4/5] w-full overflow-hidden">
               <Image
-                src={content.measureImage || "/images/made-to-measure.jpg"}
-                alt={content.measureImageAlt || "Tailor crafting a bespoke NAADE handloom garment"}
+                src="/images/heritage/legacy-card.jpg"
+                alt="More than clothing — it's a legacy. Pochampally handloom archive."
                 fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
+                sizes="(max-width: 640px) 100vw, 20vw"
+                className="object-contain object-center"
               />
             </div>
+            <div className="mt-3 border-t border-[var(--color-line)] pt-3 text-center">
+              <Link
+                href="/story"
+                className="font-serif text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-oxblood)] underline underline-offset-4 hover:text-black"
+              >
+                Discover The Legacy &rarr;
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          4. CRAFTSMANSHIP & PROCESS: THE 1990s POCHAMPALLY ARCHIVE
+         ========================================================================= */}
+      <section className="border-t border-b border-[var(--color-line)] bg-[var(--color-cotton)]/35 py-16 sm:py-24">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="font-serif text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-oxblood)]">
+              THE WEAVING PROCESS &bull; నేత ప్రక్రియ
+            </p>
+            <h2 className="mt-3 font-serif-display text-2xl sm:text-4xl text-[var(--color-charcoal)] font-normal tracking-[0.02em]">
+              Precision, Patience &amp; The Pit Loom
+            </h2>
+            <p className="mt-4 font-serif text-[15px] leading-relaxed text-[var(--color-charcoal)]/80">
+              Unlike printed industrial cloth, Pochampally Ikat patterns are calculated on mathematical graphs and resist-dyed before weaving commences.
+            </p>
+          </div>
+
+          <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Step 1 */}
+            <div className="border border-[var(--color-line)] bg-[var(--color-ivory)] p-6 shadow-2xs">
+              <div className="flex items-baseline justify-between border-b border-[var(--color-line)] pb-3">
+                <span className="font-serif text-2xl font-bold text-[var(--color-oxblood)]">01</span>
+                <span className="font-telugu text-xs text-[var(--color-turmeric)]">బాంధణి</span>
+              </div>
+              <h3 className="mt-4 font-serif-display text-base font-semibold text-[var(--color-charcoal)]">
+                Mathematical Tying
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-[var(--color-charcoal)]/75">
+                Yarn hanks are bound tightly with rubber strips based on geometric grids, protecting sections from dye penetration.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="border border-[var(--color-line)] bg-[var(--color-ivory)] p-6 shadow-2xs">
+              <div className="flex items-baseline justify-between border-b border-[var(--color-line)] pb-3">
+                <span className="font-serif text-2xl font-bold text-[var(--color-oxblood)]">02</span>
+                <span className="font-telugu text-xs text-[var(--color-turmeric)]">రంగులద్దడం</span>
+              </div>
+              <h3 className="mt-4 font-serif-display text-base font-semibold text-[var(--color-charcoal)]">
+                Resist Immersion
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-[var(--color-charcoal)]/75">
+                Submerged in authentic natural indigo, oxblood, and earth dyes. Multiple immersions create rich, enduring color depth.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="border border-[var(--color-line)] bg-[var(--color-ivory)] p-6 shadow-2xs">
+              <div className="flex items-baseline justify-between border-b border-[var(--color-line)] pb-3">
+                <span className="font-serif text-2xl font-bold text-[var(--color-oxblood)]">03</span>
+                <span className="font-telugu text-xs text-[var(--color-turmeric)]">మగ్గం నేత</span>
+              </div>
+              <h3 className="mt-4 font-serif-display text-base font-semibold text-[var(--color-charcoal)]">
+                Pit-Loom Weaving
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-[var(--color-charcoal)]/75">
+                Warp and weft meet on traditional pit-looms where human hands align each motif to reveal softened geometric lines.
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="border border-[var(--color-line)] bg-[var(--color-ivory)] p-6 shadow-2xs">
+              <div className="flex items-baseline justify-between border-b border-[var(--color-line)] pb-3">
+                <span className="font-serif text-2xl font-bold text-[var(--color-oxblood)]">04</span>
+                <span className="font-telugu text-xs text-[var(--color-turmeric)]">కుట్టుపని</span>
+              </div>
+              <h3 className="mt-4 font-serif-display text-base font-semibold text-[var(--color-charcoal)]">
+                Bespoke Tailoring
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-[var(--color-charcoal)]/75">
+                Individual lengths of woven cloth are cut and tailored into contemporary Nehru and single-breasted menswear jackets.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          5. MADE TO MEASURE & CUSTOM FIT
+         ========================================================================= */}
+      <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-10 lg:py-24">
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="flex flex-col items-start">
+            <div className="flex items-center gap-2">
+              <span className="h-px w-5 bg-[var(--color-oxblood)]" />
+              <p className="font-serif text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-oxblood)]">
+                BESPOKE ATELIER
+              </p>
+            </div>
+
+            <h2 className="mt-4 font-serif-display text-3xl sm:text-4xl text-[var(--color-charcoal)]">
+              Your Fit. Your NAADE.
+            </h2>
+
+            <p className="mt-4 font-serif text-[15px] leading-relaxed text-[var(--color-charcoal)]/85">
+              We believe authentic handloom clothing should fit with quiet confidence. Every piece in our collection can be tailored to your individual proportions at no additional charge.
+            </p>
+
+            <ul className="mt-6 space-y-3 font-serif text-xs text-[var(--color-charcoal)]/85">
+              <li className="flex items-center gap-2.5">
+                <span className="text-[var(--color-oxblood)] font-bold">&#9670;</span>
+                <span>Custom chest, waist, shoulder, sleeve length, and garment length.</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <span className="text-[var(--color-oxblood)] font-bold">&#9670;</span>
+                <span>Cut from individual lengths of cloth by our master tailor in Pochampally.</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <span className="text-[var(--color-oxblood)] font-bold">&#9670;</span>
+                <span>Dispatched with complimentary express delivery across India.</span>
+              </li>
+            </ul>
+
+            <div className="mt-8">
+              <Link
+                href="/made-to-measure"
+                className="inline-flex items-center justify-center border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-8 py-3.5 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ivory)] transition-all hover:bg-[var(--color-oxblood)] hover:border-[var(--color-oxblood)]"
+              >
+                Explore Custom Order &rarr;
+              </Link>
+            </div>
+          </div>
+
+          <div className="relative aspect-[4/3] overflow-hidden border border-[var(--color-line)] bg-[var(--color-parchment)] shadow-2xs">
+            <Image
+              src="/images/heritage/artisan-loom.jpg"
+              alt="Craftsmanship in Pochampally"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
           </div>
         </div>
       </section>

@@ -4,7 +4,7 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Frequently Asked Questions — NAADE Handloom Fashion",
+  title: "Frequently Asked Questions — NAADE Pochampally Handlooms",
   description:
     "Find answers about NAADE's Pochampally Ikat garments, made-to-measure sizing, ordering, care, and delivery across India.",
 };
@@ -23,16 +23,21 @@ export default async function FaqPage() {
 
   return (
     <main className="bg-[var(--color-ivory)]">
-      {/* Header */}
+      {/* Editorial Header */}
       <section className="mx-auto max-w-4xl px-4 pt-16 pb-10 text-center sm:px-6 lg:px-8 sm:pt-24 sm:pb-14">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[var(--color-maroon)]">
-          {content.eyebrow}
-        </p>
-        <h1 className="mt-4 font-serif-display text-[clamp(2.2rem,4.5vw,3.5rem)] text-[var(--color-charcoal)]">
-          {content.title}
+        <div className="flex items-center justify-center gap-2">
+          <span className="h-px w-6 bg-[var(--color-oxblood)]" />
+          <p className="font-serif text-[11px] font-semibold uppercase tracking-[0.25em] text-[var(--color-oxblood)]">
+            {content.eyebrow || "ATELIER ASSISTANCE"}
+          </p>
+          <span className="h-px w-6 bg-[var(--color-oxblood)]" />
+        </div>
+
+        <h1 className="mt-4 font-serif-display text-[clamp(2.2rem,4.5vw,3.5rem)] font-normal uppercase leading-[1.1] tracking-[0.03em] text-[var(--color-oxblood)]">
+          {content.title || "Frequently Asked Questions"}
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-base text-[var(--color-charcoal)]/75">
-          {content.subtitle}
+        <p className="mx-auto mt-4 max-w-xl font-serif text-[15px] leading-relaxed text-[var(--color-charcoal)]/80">
+          {content.subtitle || "Clear answers regarding our Pochampally handloom craft, bespoke sizing, ordering process, and shipping."}
         </p>
       </section>
 
@@ -45,14 +50,14 @@ export default async function FaqPage() {
               className="group py-6 [&_summary::-webkit-details-marker]:hidden"
             >
               <summary className="flex cursor-pointer items-center justify-between gap-4 text-left">
-                <h3 className="font-serif-display text-lg text-[var(--color-charcoal)] transition-colors group-hover:text-[var(--color-maroon)] sm:text-xl">
+                <h3 className="font-serif-display text-lg text-[var(--color-charcoal)] transition-colors group-hover:text-[var(--color-oxblood)] sm:text-xl">
                   {faq.q}
                 </h3>
-                <span className="shrink-0 text-xl font-light text-[var(--color-charcoal)]/50 transition-transform duration-200 group-open:rotate-45">
+                <span className="shrink-0 font-serif text-xl font-light text-[var(--color-oxblood)] transition-transform duration-200 group-open:rotate-45">
                   +
                 </span>
               </summary>
-              <div className="mt-4 pr-6 text-[15px] leading-relaxed text-[var(--color-charcoal)]/80">
+              <div className="mt-4 pr-6 font-serif text-[15px] leading-relaxed text-[var(--color-charcoal)]/85">
                 <p>{faq.a}</p>
               </div>
             </details>
@@ -60,17 +65,17 @@ export default async function FaqPage() {
         </div>
 
         {/* Contact fallback */}
-        <div className="mt-14 rounded-sm border border-[var(--color-line)] bg-[var(--color-offwhite)]/60 p-8 text-center">
-          <h4 className="font-serif-display text-xl text-[var(--color-charcoal)]">
+        <div className="mt-14 border border-[var(--color-line)] bg-[var(--color-parchment)] p-8 text-center shadow-2xs">
+          <h4 className="font-serif-display text-xl uppercase tracking-[0.06em] text-[var(--color-charcoal)]">
             Have a personal question regarding fit or cloth?
           </h4>
-          <p className="mt-2 text-sm text-[var(--color-charcoal)]/70">
+          <p className="mt-2 font-serif text-sm text-[var(--color-charcoal)]/75">
             Our atelier team in Pochampally is available to answer questions on sizing, custom measurements, and orders.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <Link
               href="/contact"
-              className="border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ivory)] hover:bg-black"
+              className="border border-[var(--color-charcoal)] bg-[var(--color-charcoal)] px-6 py-3 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-ivory)] hover:bg-[var(--color-oxblood)]"
             >
               Contact Studio
             </Link>
@@ -78,7 +83,7 @@ export default async function FaqPage() {
               href="https://wa.me/918555909550"
               target="_blank"
               rel="noopener noreferrer"
-              className="border border-[var(--color-charcoal)]/30 bg-white px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)] hover:bg-black/5"
+              className="border border-[var(--color-line)] bg-white px-6 py-3 font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-charcoal)] hover:border-[var(--color-charcoal)]"
             >
               Message on WhatsApp
             </a>

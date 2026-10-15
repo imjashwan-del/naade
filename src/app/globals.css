@@ -1,19 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Suranna&family=Ramabhadra&display=swap');
 @import "tailwindcss";
 
 :root {
-  --color-ivory: #faf8f5;
-  --color-offwhite: #f1ebd8;
-  --color-cotton: #efeae1;
-  --color-charcoal: #1c1917;
+  /* Authentic 1990s Pochampally Handloom Heritage Palette */
+  --color-ivory: #f5efe6;
+  --color-parchment: #f9f5ed;
+  --color-cotton: #ede4d5;
+  --color-offwhite: #eae0d0;
+  --color-charcoal: #1f1d1b;
   --color-black: #12100e;
-  --color-indigo: #2d3748;
-  --color-brown: #6a4b35;
-  --color-maroon: #681b22;
+  --color-indigo: #1b2938;
+  --color-brown: #5c4033;
+  --color-maroon: #631e21;
+  --color-oxblood: #631e21;
   --color-terracotta: #9c413d;
-  --color-line: #ded5c4;
+  --color-rust: #a85834;
+  --color-turmeric: #c2882a;
+  --color-line: #dfd6c7;
+  --color-line-dark: #b8ac99;
   --color-line-subtle: #eae3d5;
 
-  --font-serif: var(--font-fraunces), "Georgia", "Baskerville", serif;
+  --font-serif: "Cinzel", "Playfair Display", var(--font-fraunces), "Georgia", serif;
+  --font-editorial: "Playfair Display", "Cinzel", Georgia, serif;
+  --font-body-serif: "Cormorant Garamond", Georgia, serif;
+  --font-telugu: "Suranna", "Ramabhadra", serif;
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -41,13 +51,13 @@ body {
 }
 
 ::selection {
-  background: var(--color-charcoal);
+  background: var(--color-oxblood);
   color: var(--color-ivory);
 }
 
 /* Accessible focus styling for keyboard navigation */
 :focus-visible {
-  outline: 2px solid var(--color-charcoal);
+  outline: 2px solid var(--color-oxblood);
   outline-offset: 3px;
 }
 
@@ -55,11 +65,23 @@ body {
   font-family: var(--font-serif);
 }
 
+.font-editorial {
+  font-family: var(--font-editorial);
+}
+
+.font-body-serif {
+  font-family: var(--font-body-serif);
+}
+
+.font-telugu {
+  font-family: var(--font-telugu);
+}
+
 .tracking-wide-xs {
   letter-spacing: 0.14em;
 }
 
-/* Subtle ikat-inspired diamond divider used sparingly near section headings */
+/* Subtle ikat-inspired diamond divider used sparingly */
 .ikat-divider {
   display: flex;
   align-items: center;
@@ -84,15 +106,49 @@ body {
   height: 5px;
   transform: rotate(45deg);
   background: currentColor;
-  opacity: 0.75;
+  opacity: 0.85;
+}
+
+/* Subtle vintage textile & paper grain background */
+.paper-texture {
+  background-color: var(--color-ivory);
+  background-image:
+    radial-gradient(var(--color-charcoal) 0.4px, transparent 0.4px),
+    radial-gradient(var(--color-charcoal) 0.4px, var(--color-ivory) 0.4px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+  background-attachment: local;
 }
 
 /* Woven texture background, extremely subtle and hardware-accelerated */
 .weave-bg {
   background-color: var(--color-ivory);
   background-image:
-    repeating-linear-gradient(45deg, rgba(28, 25, 23, 0.025) 0, rgba(28, 25, 23, 0.025) 1px, transparent 1px, transparent 12px),
-    repeating-linear-gradient(-45deg, rgba(28, 25, 23, 0.025) 0, rgba(28, 25, 23, 0.025) 1px, transparent 1px, transparent 12px);
+    repeating-linear-gradient(45deg, rgba(31, 29, 27, 0.02) 0, rgba(31, 29, 27, 0.02) 1px, transparent 1px, transparent 12px),
+    repeating-linear-gradient(-45deg, rgba(31, 29, 27, 0.02) 0, rgba(31, 29, 27, 0.02) 1px, transparent 1px, transparent 12px);
+}
+
+/* Vintage 1990s Editorial Framing */
+.vintage-frame {
+  border: 1px solid var(--color-line);
+  box-shadow: 0 1px 3px rgba(31, 29, 27, 0.04);
+}
+
+.vintage-frame-double {
+  border: 3px double var(--color-line-dark);
+}
+
+.vintage-button {
+  border: 1px solid var(--color-charcoal);
+  background: transparent;
+  color: var(--color-charcoal);
+  transition: all 0.2s ease-in-out;
+}
+
+.vintage-button:hover {
+  background-color: var(--color-oxblood);
+  border-color: var(--color-oxblood);
+  color: var(--color-ivory);
 }
 
 .line-clamp-1 {

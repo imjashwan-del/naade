@@ -22,7 +22,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
     <div className="flex gap-4 border-b border-[var(--color-line)] py-6 sm:gap-6">
       <Link
         href={`/product/${item.slug}`}
-        className="relative h-28 w-24 shrink-0 overflow-hidden bg-[var(--color-offwhite)] sm:h-36 sm:w-28"
+        className="relative h-28 w-24 shrink-0 overflow-hidden border border-[var(--color-line)] bg-[var(--color-parchment)] sm:h-36 sm:w-28"
       >
         <Image src={item.imageUrl} alt={item.name} fill sizes="140px" className="object-cover" />
       </Link>
@@ -32,60 +32,62 @@ export function CartItemRow({ item }: { item: CartItem }) {
           <div>
             <Link
               href={`/product/${item.slug}`}
-              className="text-sm font-medium uppercase tracking-[0.02em] text-[var(--color-charcoal)]"
+              className="font-serif-display text-[15px] font-medium tracking-[0.02em] text-[var(--color-charcoal)] transition-colors hover:text-[var(--color-oxblood)]"
             >
               {item.name}
             </Link>
-            <p className="mt-1 text-xs capitalize text-[var(--color-charcoal)]/55">{item.category}</p>
-            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-charcoal)]/70">
+            <p className="mt-1 font-serif text-xs uppercase tracking-[0.12em] text-[var(--color-charcoal)]/60">
+              {item.category} &bull; Pochampally Ikat
+            </p>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-serif text-xs text-[var(--color-charcoal)]/80">
               {item.isMadeToMeasure ? (
-                <span className="font-semibold uppercase tracking-[0.08em] text-[var(--color-maroon)]">
-                  Made to Measure
+                <span className="font-semibold uppercase tracking-[0.14em] text-[var(--color-oxblood)]">
+                  Made to Measure (Custom Tailored)
                 </span>
               ) : (
                 item.size && <span>Size: {item.size}</span>
               )}
             </div>
             {item.isMadeToMeasure && item.measurements ? (
-              <dl className="mt-2 grid grid-cols-3 gap-x-3 gap-y-1 text-[11px] text-[var(--color-charcoal)]/60">
+              <dl className="mt-2 grid grid-cols-3 gap-x-3 gap-y-1 font-serif text-[11px] text-[var(--color-charcoal)]/70">
                 {MEASUREMENT_LABELS.map((m) => (
                   <div key={m.key} className="flex gap-1">
-                    <dt className="font-medium">{m.label}:</dt>
+                    <dt className="font-medium text-[var(--color-charcoal)]/60">{m.label}:</dt>
                     <dd>{item.measurements?.[m.key]}&quot;</dd>
                   </div>
                 ))}
               </dl>
             ) : null}
           </div>
-          <p className="whitespace-nowrap text-sm font-medium text-[var(--color-charcoal)]">
+          <p className="whitespace-nowrap font-serif text-base font-normal text-[var(--color-charcoal)]">
             {formatPrice(item.price * item.quantity)}
           </p>
         </div>
 
         <div className="mt-3 flex items-center justify-between">
-          <div className="flex h-9 w-28 items-center justify-between border border-[var(--color-charcoal)]/25">
+          <div className="flex h-9 w-28 items-center justify-between border border-[var(--color-line)] bg-[var(--color-parchment)]">
             <button
               type="button"
               aria-label="Decrease quantity"
               onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
-              className="h-full w-9 text-base text-[var(--color-charcoal)]"
+              className="h-full w-9 text-base text-[var(--color-charcoal)] hover:bg-[var(--color-cotton)]"
             >
-              −
+              &minus;
             </button>
-            <span className="text-sm">{item.quantity}</span>
+            <span className="font-serif text-sm font-semibold">{item.quantity}</span>
             <button
               type="button"
               aria-label="Increase quantity"
               onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
-              className="h-full w-9 text-base text-[var(--color-charcoal)]"
+              className="h-full w-9 text-base text-[var(--color-charcoal)] hover:bg-[var(--color-cotton)]"
             >
-              +
+              &#43;
             </button>
           </div>
           <button
             type="button"
             onClick={() => removeItem(item.cartItemId)}
-            className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--color-charcoal)]/60 underline underline-offset-4 hover:text-[var(--color-maroon)]"
+            className="font-serif text-xs font-semibold uppercase tracking-[0.1em] text-[var(--color-charcoal)]/60 underline underline-offset-4 hover:text-[var(--color-oxblood)]"
           >
             Remove
           </button>

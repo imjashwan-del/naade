@@ -1,11 +1,20 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import type { Product } from "@/db/schema";
 
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL"];
+
+type StorageStatus = {
+  configured: boolean;
+  hasUrl: boolean;
+  hasServiceRoleKey: boolean;
+  bucket: string;
+  status: string;
+  message: string;
+};
 
 export type ProductFormValues = {
   name: string;
@@ -87,7 +96,24 @@ export function ProductForm({ product }: { product?: Product }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [storageStatus, setStorageStatus] = useState<StorageStatus | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/admin/storage-status")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: StorageStatus | null) => {
+        if (active && data) {
+          setStorageStatus(data);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function set<K extends keyof ProductFormValues>(
     key: K,
@@ -107,24 +133,48 @@ export function ProductForm({ product }: { product?: Product }) {
 
   async function handleUpload(file: File) {
     setUploading(true);
-    setError(null);
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/admin/upload", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    setUploading(false);
-    if (!res.ok) {
-      setError(data.error || "Upload failed");
-      return;
+    setUploadError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setUploadError(data.error || "Image upload failed");
+        return;
+      }
+      if (!values.mainImageUrl) {
+        set("mainImageUrl", data.url);
+      }
+      set("galleryImages", [...values.galleryImages, data.url]);
+      set("images", [...values.images, data.url]);
+    } catch {
+      setUploadError("Image upload failed. Check connection and server configuration.");
+    } finally {
+      setUploading(false);
     }
-    if (!values.mainImageUrl) {
-      set("mainImageUrl", data.url);
+  }
+
+  async function handleDeleteImage(imgUrl: string, index: number) {
+    const updatedGallery = values.galleryImages.filter((_, idx) => idx !== index);
+    const updatedImages = values.images.filter((_, idx) => idx !== index);
+    set("galleryImages", updatedGallery);
+    set("images", updatedImages);
+    if (values.mainImageUrl === imgUrl) {
+      set("mainImageUrl", updatedGallery[0] ?? "");
     }
-    set("galleryImages", [...values.galleryImages, data.url]);
-    set("images", [...values.images, data.url]);
+    try {
+      await fetch("/api/admin/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: imgUrl }),
+      });
+    } catch {
+      // Non-blocking background deletion
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -267,8 +317,61 @@ export function ProductForm({ product }: { product?: Product }) {
         />
       </section>
 
-      <section>
-        <FieldLabel>Images</FieldLabel>
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <FieldLabel>Images</FieldLabel>
+          {storageStatus?.configured ? (
+            <span className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-700">
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
+              Supabase Storage connected ({storageStatus.bucket})
+            </span>
+          ) : storageStatus && !storageStatus.configured ? (
+            <span className="flex items-center gap-1.5 text-[11px] font-medium text-amber-700">
+              <span className="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
+              Storage key required on server
+            </span>
+          ) : null}
+        </div>
+
+        {storageStatus && !storageStatus.configured && (
+          <div className="rounded border border-amber-300 bg-amber-50/90 p-3.5 text-xs text-amber-950">
+            <div className="flex items-start gap-2.5">
+              <span className="text-sm">⚠️</span>
+              <div className="space-y-1">
+                <p className="font-semibold text-amber-900">
+                  Supabase Image Storage Requires Server Configuration
+                </p>
+                <p className="text-amber-800 leading-relaxed">
+                  Image uploads to Supabase require the secret{" "}
+                  <code className="rounded bg-amber-100 px-1 py-0.5 font-mono text-[11px] font-semibold text-amber-900">
+                    SUPABASE_SERVICE_ROLE_KEY
+                  </code>{" "}
+                  environment variable to be configured in your server settings.
+                </p>
+                <p className="text-[11px] text-amber-800/80">
+                  For security, service keys cannot be entered in browser forms. Add this key to your{" "}
+                  <code className="font-mono">.env.local</code> file locally or to your Vercel Project Environment Variables.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {uploadError && (
+          <div className="flex items-center justify-between rounded border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+            <span className="flex items-center gap-1.5">
+              <span className="font-bold">✕</span> {uploadError}
+            </span>
+            <button
+              type="button"
+              onClick={() => setUploadError(null)}
+              className="ml-3 font-semibold text-rose-600 hover:text-rose-900"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-3">
           {values.galleryImages.map((img, i) => (
             <div
@@ -284,19 +387,9 @@ export function ProductForm({ product }: { product?: Product }) {
               />
               <button
                 type="button"
-                onClick={() => {
-                  set(
-                    "galleryImages",
-                    values.galleryImages.filter((_, idx) => idx !== i),
-                  );
-                  set(
-                    "images",
-                    values.images.filter((_, idx) => idx !== i),
-                  );
-                  if (values.mainImageUrl === img)
-                    set("mainImageUrl", values.galleryImages[0] ?? "");
-                }}
-                className="absolute right-0 top-0 bg-black/70 px-1 text-[10px] text-white"
+                onClick={() => handleDeleteImage(img, i)}
+                className="absolute right-0 top-0 bg-black/70 px-1 text-[10px] text-white hover:bg-black"
+                title="Remove image"
               >
                 ×
               </button>
@@ -306,14 +399,18 @@ export function ProductForm({ product }: { product?: Product }) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="flex h-20 w-20 items-center justify-center border border-dashed border-black/30 text-[11px] text-black/50"
+            className="flex h-20 w-20 flex-col items-center justify-center border border-dashed border-black/30 text-[11px] text-black/60 hover:border-black/60 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {uploading ? "…" : "+ Upload"}
+            {uploading ? (
+              <span className="animate-pulse">Uploading…</span>
+            ) : (
+              <span>+ Upload</span>
+            )}
           </button>
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             hidden
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -322,11 +419,16 @@ export function ProductForm({ product }: { product?: Product }) {
             }}
           />
         </div>
+        {uploading && (
+          <p className="text-xs text-[var(--color-charcoal)]/70">
+            Uploading image to Supabase Storage…
+          </p>
+        )}
         <TextField
           label="Main Image URL"
           value={values.mainImageUrl}
           onChange={(v) => set("mainImageUrl", v)}
-          hint="Set automatically from the first uploaded image, or paste a path."
+          hint="Set automatically from the first uploaded image, or paste a path or URL."
           required
         />
       </section>

@@ -4,21 +4,30 @@ import type { Product } from "@/db/schema";
 import { formatPrice } from "@/lib/format";
 import { Badge } from "./Badge";
 
-export function ProductCard({ product }: { product: Product }) {
-  const isSoldOut = product.inventoryQuantity !== undefined && product.inventoryQuantity <= 0;
+export function ProductCard({
+  product,
+  priority = false,
+}: {
+  product: Product;
+  priority?: boolean;
+}) {
+  const isSoldOut =
+    product.inventoryQuantity !== undefined && product.inventoryQuantity <= 0;
 
   return (
     <Link
       href={`/product/${product.slug}`}
-      className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-charcoal)]"
+      className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-oxblood)]"
       aria-label={`View ${product.name}, price ${formatPrice(product.price)}`}
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-[var(--color-cotton)] border border-[var(--color-line)]/40 shadow-xs">
+      {/* Product Image Frame */}
+      <div className="relative aspect-[4/5] overflow-hidden rounded-xs border border-[var(--color-line)] bg-[var(--color-cotton)] shadow-2xs transition-all duration-300 group-hover:border-[var(--color-line-dark)]">
         <Image
           src={product.mainImageUrl}
           alt={product.name}
           fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          priority={priority}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
         />
         {product.galleryImages?.[1] ? (
@@ -26,42 +35,38 @@ export function ProductCard({ product }: { product: Product }) {
             src={product.galleryImages[1]}
             alt=""
             fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
             aria-hidden
             loading="lazy"
             className="object-cover opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
           />
         ) : null}
 
-        {/* Badges */}
-        <div className="absolute left-2.5 top-2.5 flex flex-col gap-1.5 sm:left-3 sm:top-3">
-          {product.isNewArrival && <Badge>New</Badge>}
+        {/* Vintage Badges */}
+        <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1 sm:left-3 sm:top-3">
+          {product.isNewArrival && <Badge tone="oxblood">NEW</Badge>}
           {product.customMeasurementsEnabled && (
-            <span className="rounded-xs bg-[var(--color-charcoal)]/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-ivory)] backdrop-blur-sm">
+            <span className="border border-[var(--color-charcoal)]/40 bg-[var(--color-ivory)]/95 px-2 py-0.5 font-serif text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)] backdrop-blur-xs">
               Custom Fit
             </span>
           )}
         </div>
 
         {isSoldOut && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/45 backdrop-blur-[1px]">
-            <span className="rounded-xs bg-black/85 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white">
-              Sold Out
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px]">
+            <span className="border border-white/40 bg-black/85 px-3 py-1 font-serif text-[11px] font-semibold uppercase tracking-widest text-white">
+              Archived / Sold Out
             </span>
           </div>
         )}
       </div>
 
-      <div className="mt-3.5 flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <h3 className="font-serif-display text-sm sm:text-[15px] font-normal tracking-[0.02em] text-[var(--color-charcoal)] group-hover:text-[var(--color-maroon)] transition-colors truncate">
-            {product.name}
-          </h3>
-          <p className="mt-0.5 text-[11px] uppercase tracking-wider text-[var(--color-charcoal)]/60 truncate">
-            {product.clothName || (product.category === "jacket" ? "Handwoven Jacket" : "Handloom Shirt")}
-          </p>
-        </div>
-        <p className="whitespace-nowrap font-sans font-semibold text-sm text-[var(--color-charcoal)]">
+      {/* Product Details - Authentic Editorial Typography */}
+      <div className="mt-3.5 flex flex-col items-start">
+        <h3 className="font-serif-display text-[15px] font-medium tracking-[0.02em] text-[var(--color-charcoal)] transition-colors group-hover:text-[var(--color-oxblood)]">
+          {product.name}
+        </h3>
+        <p className="mt-1 font-serif text-sm font-medium tracking-[0.02em] text-[var(--color-charcoal)]/90">
           {formatPrice(product.price)}
         </p>
       </div>

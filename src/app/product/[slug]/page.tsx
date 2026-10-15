@@ -35,17 +35,17 @@ export default async function ProductPage({
 
   return (
     <main className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-10 lg:py-16">
-      {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="mb-8 text-xs text-[var(--color-charcoal)]/50">
+      {/* Editorial Breadcrumbs */}
+      <nav aria-label="Breadcrumb" className="mb-8 font-serif text-xs text-[var(--color-charcoal)]/60">
         <ol className="flex items-center gap-2">
           <li>
-            <Link href="/" className="hover:text-[var(--color-charcoal)]">
+            <Link href="/" className="hover:text-[var(--color-oxblood)]">
               Home
             </Link>
           </li>
           <li>/</li>
           <li>
-            <Link href="/shop" className="hover:text-[var(--color-charcoal)]">
+            <Link href="/shop" className="hover:text-[var(--color-oxblood)]">
               Shop
             </Link>
           </li>
@@ -53,45 +53,50 @@ export default async function ProductPage({
           <li>
             <Link
               href={`/shop?category=${product.category}`}
-              className="capitalize hover:text-[var(--color-charcoal)]"
+              className="capitalize hover:text-[var(--color-oxblood)]"
             >
               {product.category}s
             </Link>
           </li>
           <li>/</li>
-          <li className="font-medium text-[var(--color-charcoal)] truncate max-w-[200px]">
+          <li className="font-semibold text-[var(--color-charcoal)] truncate max-w-[200px]">
             {product.name}
           </li>
         </ol>
       </nav>
 
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-        {/* Gallery */}
-        <ProductGallery images={gallery} alt={product.name} />
+        {/* Product Gallery */}
+        <div className="border border-[var(--color-line)] bg-[var(--color-parchment)] p-2 shadow-2xs">
+          <ProductGallery images={gallery} alt={product.name} />
+        </div>
 
         {/* Product Information */}
-        <div className="lg:pt-2">
-          <div className="flex items-center gap-2">
-            {product.isNewArrival && <Badge>New</Badge>}
-            <p className="text-[11px] font-mono uppercase tracking-[0.14em] text-[var(--color-charcoal)]/50">
-              {product.productCode}
+        <div className="flex flex-col lg:pt-2">
+          <div className="flex items-center gap-2.5">
+            {product.isNewArrival && <Badge tone="oxblood">NEW PIECE</Badge>}
+            <p className="font-serif text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-charcoal)]/60">
+              {product.productCode || "POCHAMPALLY IKAT"}
             </p>
           </div>
 
-          <h1 className="mt-3 font-serif-display text-[clamp(1.9rem,3.5vw,2.75rem)] leading-tight text-[var(--color-charcoal)]">
+          <h1 className="mt-3 font-serif-display text-[clamp(2.1rem,4vw,3.2rem)] font-normal uppercase leading-[1.08] tracking-[0.03em] text-[var(--color-oxblood)]">
             {product.name}
           </h1>
 
-          <p className="mt-2 text-xs uppercase tracking-[0.12em] text-[var(--color-maroon)]">
-            {product.category} • Handwoven Ikat
-          </p>
+          <div className="mt-2 flex items-center gap-2 font-serif text-xs uppercase tracking-[0.16em] text-[var(--color-charcoal)]/75">
+            <span>{product.category}</span>
+            <span>&bull;</span>
+            <span>Telangana Pit-Loom Weave</span>
+            <span className="font-telugu text-[var(--color-turmeric)]">పోచంపల్లి</span>
+          </div>
 
-          <p className="mt-4 text-2xl font-medium text-[var(--color-charcoal)]">
+          <p className="mt-5 font-serif text-2xl font-normal text-[var(--color-charcoal)]">
             {formatPrice(product.price)}
           </p>
 
           {product.description && (
-            <p className="mt-6 max-w-lg text-[15px] leading-relaxed text-[var(--color-charcoal)]/80">
+            <p className="mt-6 max-w-lg font-serif text-[15px] leading-relaxed text-[var(--color-charcoal)]/85">
               {product.description}
             </p>
           )}
@@ -113,15 +118,15 @@ export default async function ProductPage({
             />
           </div>
 
-          {/* Craft Specifications */}
+          {/* Craft Specifications Table */}
           {details.length > 0 && (
             <dl className="mt-10 grid grid-cols-1 gap-4 border-t border-[var(--color-line)] pt-8 sm:grid-cols-2">
               {details.map((detail) => (
-                <div key={detail.label} className="border-b border-black/5 pb-3">
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]/50">
+                <div key={detail.label} className="border-b border-[var(--color-line)] pb-3">
+                  <dt className="font-serif text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--color-charcoal)]/60">
                     {detail.label}
                   </dt>
-                  <dd className="mt-1 text-sm font-medium text-[var(--color-charcoal)]">
+                  <dd className="mt-1 font-serif text-sm font-medium text-[var(--color-charcoal)]">
                     {detail.value}
                   </dd>
                 </div>
@@ -132,29 +137,29 @@ export default async function ProductPage({
           {/* Craft Story */}
           {product.craftStory && (
             <div className="mt-8 border-t border-[var(--color-line)] pt-8">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-maroon)]">
-                Artisan Story
+              <p className="font-serif text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--color-oxblood)]">
+                The Heritage Story
               </p>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--color-charcoal)]/80">
+              <p className="mt-2 font-serif text-sm leading-relaxed text-[var(--color-charcoal)]/80">
                 {product.craftStory}
               </p>
             </div>
           )}
 
           {/* Trust Highlights */}
-          <div className="mt-8 grid grid-cols-2 gap-4 border-t border-[var(--color-line)] pt-8 text-xs text-[var(--color-charcoal)]/70">
+          <div className="mt-8 grid grid-cols-2 gap-4 border-t border-[var(--color-line)] pt-8 font-serif text-xs text-[var(--color-charcoal)]/75">
             <div className="flex items-start gap-2.5">
-              <span className="font-serif-display text-base text-[var(--color-maroon)]">✓</span>
+              <span className="text-base font-bold text-[var(--color-oxblood)]">&#10003;</span>
               <div>
                 <p className="font-semibold text-[var(--color-charcoal)]">Complimentary Shipping</p>
-                <p className="mt-0.5 text-[11px]">Dispatched across India in 3–5 business days.</p>
+                <p className="mt-0.5 text-[11px] text-[var(--color-charcoal)]/65">Across India in 3–5 business days.</p>
               </div>
             </div>
             <div className="flex items-start gap-2.5">
-              <span className="font-serif-display text-base text-[var(--color-maroon)]">✓</span>
+              <span className="text-base font-bold text-[var(--color-oxblood)]">&#10003;</span>
               <div>
-                <p className="font-semibold text-[var(--color-charcoal)]">Bespoke Fit</p>
-                <p className="mt-0.5 text-[11px]">Individual made-to-measure tailoring option.</p>
+                <p className="font-semibold text-[var(--color-charcoal)]">Bespoke Proportions</p>
+                <p className="mt-0.5 text-[11px] text-[var(--color-charcoal)]/65">Individual tailoring at no extra fee.</p>
               </div>
             </div>
           </div>
@@ -164,20 +169,20 @@ export default async function ProductPage({
       {/* Related Products */}
       {related.length > 0 && (
         <section className="mt-24 border-t border-[var(--color-line)] pt-16">
-          <div className="mb-10 flex items-end justify-between">
+          <div className="mb-10 flex items-end justify-between border-b border-[var(--color-line)] pb-5">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--color-maroon)]">
-                More in {product.category}s
+              <p className="font-serif text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--color-oxblood)]">
+                Archive Selection
               </p>
-              <h2 className="mt-2 font-serif-display text-2xl text-[var(--color-charcoal)] sm:text-3xl">
+              <h2 className="mt-2 font-serif-display text-2xl uppercase tracking-[0.12em] text-[var(--color-charcoal)]">
                 Complementary Pieces
               </h2>
             </div>
             <Link
               href={`/shop?category=${product.category}`}
-              className="text-xs font-semibold uppercase tracking-wider text-[var(--color-charcoal)] underline underline-offset-4"
+              className="font-serif text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-charcoal)] transition-colors hover:text-[var(--color-oxblood)]"
             >
-              View all {product.category}s →
+              View all {product.category}s &rarr;
             </Link>
           </div>
           <ProductGrid products={related} />

@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
@@ -17,6 +19,7 @@ const MobileMenu = dynamic(
 );
 
 export function Navbar({ content }: { content: SiteContentValues }) {
+  const pathname = usePathname();
   const { itemCount, isLoaded } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -25,90 +28,92 @@ export function Navbar({ content }: { content: SiteContentValues }) {
     content.announcementEnabled !== "false" && Boolean(content.announcementText);
 
   const navLinks = [
-    { href: "/shop", label: content.navShop || "Shop" },
-    { href: "/shop?category=jacket", label: content.navJackets || "Jackets" },
-    { href: "/shop?category=shirt", label: content.navShirts || "Shirts" },
-    {
-      href: "/made-to-measure",
-      label: content.navMadeToMeasure || "Made to Measure",
-    },
-    { href: "/story", label: content.navStory || "Our Story" },
-    { href: "/faq", label: content.navFaq || "FAQ" },
+    { href: "/", label: "HOME", exact: true },
+    { href: "/shop", label: "SHOP", exact: false },
+    { href: "/story", label: "OUR STORY", exact: false },
+    { href: "/made-to-measure", label: "CUSTOM ORDER", exact: false },
+    { href: "/contact", label: "CONTACT", exact: false },
   ];
 
   return (
     <>
-      {/* Announcement Bar */}
+      {/* 90s Heritage Announcement Bar */}
       {showAnnouncement && (
-        <div className="bg-[var(--color-charcoal)] px-4 py-2 text-center text-[11px] font-medium tracking-[0.14em] text-[var(--color-ivory)]">
-          <p className="mx-auto max-w-5xl uppercase">
-            {content.announcementText}
+        <div className="border-b border-[#441416] bg-[var(--color-oxblood)] px-4 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-[#f5efe6]">
+          <p className="mx-auto max-w-5xl">
+            {content.announcementText ||
+              "Handwoven Pochampally Ikat • Complimentary Shipping Across India • Bespoke Sizing"}
           </p>
         </div>
       )}
 
-      {/* Main Header */}
-      <header className="sticky top-0 z-40 border-b border-[var(--color-line)] bg-[var(--color-ivory)]/95 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-10">
-          {/* Logo */}
+      {/* Main Heritage Header */}
+      <header className="sticky top-0 z-40 border-b border-[var(--color-line)] bg-[var(--color-ivory)]/98 backdrop-blur-xs">
+        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-10">
+          {/* Authentic Brand Wordmark with Pochampally Ikat Symbol */}
           <Link
             href="/"
-            className="group flex items-baseline gap-2 font-serif-display text-2xl tracking-[0.06em] text-[var(--color-charcoal)]"
+            className="group flex items-center gap-3.5 focus-visible:outline-none"
+            aria-label="NAADE Pochampally Handloom Homepage"
           >
-            <span>{content.brand || "NAADE"}</span>
-            <span className="hidden text-[9px] font-sans font-semibold uppercase tracking-[0.25em] text-[var(--color-maroon)] sm:inline-block">
-              Pochampally
-            </span>
+            {/* Authentic Diamond Motif Icon */}
+            <div className="relative h-8 w-8 shrink-0 transition-transform duration-300 group-hover:scale-105">
+              <Image
+                src="/images/heritage/ikat-motif.png"
+                alt=""
+                aria-hidden
+                fill
+                className="object-contain"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <span className="font-serif-display text-2xl font-normal tracking-[0.14em] text-[var(--color-charcoal)] transition-colors group-hover:text-[var(--color-oxblood)] sm:text-[28px]">
+                {content.brand || "NAADE"}
+              </span>
+              <span className="font-serif text-[9px] font-medium tracking-[0.22em] text-[var(--color-charcoal)]/75 uppercase">
+                Pochampally Ikat &bull; Handloom &bull; India
+              </span>
+            </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-7 lg:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]/75 transition-colors hover:text-[var(--color-charcoal)]"
-              >
-                {link.label}
-              </Link>
-            ))}
+          {/* Desktop Heritage Navigation */}
+          <nav className="hidden items-center gap-8 lg:flex">
+            {navLinks.map((link) => {
+              const isActive = link.exact
+                ? pathname === link.href
+                : pathname?.startsWith(link.href);
+
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`relative py-1 font-serif text-[11px] font-medium tracking-[0.16em] uppercase transition-colors hover:text-[var(--color-oxblood)] ${
+                    isActive
+                      ? "text-[var(--color-charcoal)] font-semibold"
+                      : "text-[var(--color-charcoal)]/80"
+                  }`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[var(--color-oxblood)]" />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Right Action Icons */}
-          <div className="flex items-center gap-4 sm:gap-6">
+          {/* Right Action Icons: Search, Profile/Admin, Shopping Bag */}
+          <div className="flex items-center gap-5 sm:gap-7">
             {/* Search Trigger */}
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              aria-label={content.searchLabel || "Search"}
-              className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]/80 transition-colors hover:text-[var(--color-charcoal)]"
+              aria-label="Search collection"
+              className="p-1 text-[var(--color-charcoal)]/80 transition-colors hover:text-[var(--color-oxblood)]"
             >
               <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-              <span className="hidden sm:inline">
-                {content.searchLabel || "Search"}
-              </span>
-            </button>
-
-            {/* Bag / Cart */}
-            <Link
-              href="/cart"
-              aria-label={content.bagLabel || "Shopping Bag"}
-              className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]/80 transition-colors hover:text-[var(--color-charcoal)]"
-            >
-              <svg
-                className="h-4 w-4"
+                className="h-[19px] w-[19px]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -117,12 +122,54 @@ export function Navbar({ content }: { content: SiteContentValues }) {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+            </button>
+
+            {/* Profile / Admin Login Link */}
+            <Link
+              href="/admin/login"
+              aria-label="Atelier Login & Account"
+              className="p-1 text-[var(--color-charcoal)]/80 transition-colors hover:text-[var(--color-oxblood)]"
+            >
+              <svg
+                className="h-[19px] w-[19px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                />
+              </svg>
+            </Link>
+
+            {/* Shopping Bag with Badge */}
+            <Link
+              href="/cart"
+              aria-label="View Shopping Bag"
+              className="group relative p-1 text-[var(--color-charcoal)]/85 transition-colors hover:text-[var(--color-oxblood)]"
+            >
+              <svg
+                className="h-[21px] w-[21px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1.7"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25c-.669 0-1.189-.578-1.119-1.243l1.263-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                 />
               </svg>
-              <span>{content.bagLabel || "Bag"}</span>
-              <span className="font-mono text-xs">
-                {isLoaded && itemCount > 0 ? `(${itemCount})` : "(0)"}
+              {/* Badge Counter */}
+              <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-oxblood)] px-1 font-serif text-[10px] font-bold text-[#f5efe6] shadow-xs">
+                {isLoaded ? itemCount : 0}
               </span>
             </Link>
 
@@ -131,7 +178,7 @@ export function Navbar({ content }: { content: SiteContentValues }) {
               type="button"
               onClick={() => setMenuOpen(true)}
               aria-label="Open navigation menu"
-              className="flex h-9 w-9 items-center justify-center rounded border border-[var(--color-line)] text-[var(--color-charcoal)] lg:hidden"
+              className="flex h-9 w-9 items-center justify-center border border-[var(--color-line)] text-[var(--color-charcoal)] lg:hidden"
             >
               <svg
                 className="h-5 w-5"
@@ -154,11 +201,11 @@ export function Navbar({ content }: { content: SiteContentValues }) {
       {/* Interactive Search Modal */}
       <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      {/* Mobile Drawer */}
+      {/* Mobile Heritage Drawer */}
       <MobileMenu
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
-        links={navLinks}
+        links={navLinks.map((l) => ({ href: l.href, label: l.label }))}
         onOpenSearch={() => setSearchOpen(true)}
       />
     </>
