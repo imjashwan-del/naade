@@ -124,9 +124,18 @@ export function AddToBagPanel({ product }: { product: ProductForCart }) {
 
       {mode === "standard" && hasStandardSizes ? (
         <div>
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]">
-            Select Size
-          </p>
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]">
+              Select Size
+            </p>
+            <Link
+              href="/size-guide"
+              target="_blank"
+              className="text-xs text-[var(--color-maroon)] underline underline-offset-4 hover:text-[var(--color-charcoal)]"
+            >
+              Size Guide ↗
+            </Link>
+          </div>
           <SizeSelector
             sizes={product.availableSizes}
             selected={selectedSize}

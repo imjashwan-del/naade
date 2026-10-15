@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { db } from "@/db";
 import { products, type Product } from "@/db/schema";
 import { and, asc, desc, eq } from "drizzle-orm";
@@ -9,7 +10,9 @@ export type ProductFilters = {
   isFeatured?: boolean;
 };
 
-export async function getActiveProducts(filters: ProductFilters = {}): Promise<Product[]> {
+export const getActiveProducts = cache(async function getActiveProducts(
+  filters: ProductFilters = {},
+): Promise<Product[]> {
   try {
     const conditions = [eq(products.isActive, true)];
     if (filters.category) conditions.push(eq(products.category, filters.category));
@@ -32,9 +35,11 @@ export async function getActiveProducts(filters: ProductFilters = {}): Promise<P
   if (filters.isNewArrival) fallback = fallback.filter((p) => p.isNewArrival);
   if (filters.isFeatured) fallback = fallback.filter((p) => p.isFeatured);
   return fallback;
-}
+});
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export const getProductBySlug = cache(async function getProductBySlug(
+  slug: string,
+): Promise<Product | null> {
   try {
     const rows = await db
       .select()
@@ -46,9 +51,11 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     // fall through
   }
   return FALLBACK_PRODUCTS.find((p) => p.slug === slug && p.isActive) ?? null;
-}
+});
 
-export async function getProductById(id: number): Promise<Product | null> {
+export const getProductById = cache(async function getProductById(
+  id: number,
+): Promise<Product | null> {
   const rows = await db.select().from(products).where(eq(products.id, id)).limit(1);
   return rows[0] ?? null;
-}
+});

@@ -34,14 +34,15 @@ export async function ShopView({
       ?.label ?? content.tabAll;
 
   return (
-    <main className="mx-auto max-w-[1440px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
+    <main className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
       <SectionHeading
-        eyebrow={content.eyebrow}
-        title={content.title}
-        copy={content.copy}
+        eyebrow={content.eyebrow || "The Catalog"}
+        title={content.title || "Shop NAADE"}
+        copy={content.copy || "Contemporary menswear handwoven from Pochampally Ikat."}
       />
 
-      <div className="mt-8 flex flex-wrap gap-2 border-b border-[var(--color-line)] pb-6">
+      {/* Filter Tabs */}
+      <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-[var(--color-line)] pb-5">
         {tabs.map((tab) => {
           const queryParams = new URLSearchParams({
             ...(tab.category ? { category: tab.category } : {}),
@@ -49,7 +50,7 @@ export async function ShopView({
           }).toString();
 
           const href = queryParams
-            ? `${basePath === "/" ? "/" : basePath}?${queryParams}`
+            ? `${basePath === "/" ? "/shop" : basePath}?${queryParams}`
             : basePath;
 
           const isActive = tab.label === activeLabel;
@@ -57,10 +58,10 @@ export async function ShopView({
             <Link
               key={tab.label}
               href={href}
-              className={`px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors ${
+              className={`rounded-xs px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-charcoal)] ${
                 isActive
-                  ? "bg-[var(--color-charcoal)] text-[var(--color-ivory)]"
-                  : "bg-transparent text-[var(--color-charcoal)]/60 hover:text-[var(--color-charcoal)]"
+                  ? "bg-[var(--color-charcoal)] text-[var(--color-ivory)] shadow-xs"
+                  : "bg-transparent text-[var(--color-charcoal)]/70 hover:bg-[var(--color-cotton)] hover:text-[var(--color-charcoal)]"
               }`}
             >
               {tab.label}
@@ -69,11 +70,21 @@ export async function ShopView({
         })}
       </div>
 
-      <p className="mt-6 text-xs uppercase tracking-[0.1em] text-[var(--color-charcoal)]/50">
-        {products.length} {products.length === 1 ? "piece" : "pieces"}
-      </p>
+      <div className="mt-6 flex items-center justify-between">
+        <p className="text-xs font-medium uppercase tracking-[0.12em] text-[var(--color-charcoal)]/60">
+          Showing {products.length} {products.length === 1 ? "handloom piece" : "handloom pieces"}
+        </p>
+        {(category || filter) && (
+          <Link
+            href={basePath}
+            className="text-xs text-[var(--color-maroon)] underline underline-offset-4 hover:text-black"
+          >
+            Clear filters
+          </Link>
+        )}
+      </div>
 
-      <div className="mt-6">
+      <div className="mt-8">
         <ProductGrid products={products} />
       </div>
     </main>

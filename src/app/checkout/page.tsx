@@ -54,18 +54,21 @@ export default function CheckoutPage() {
   function validate(): boolean {
     const next: Partial<Record<keyof FormState, string>> = {};
     if (form.fullName.trim().length < 2) next.fullName = "Enter your full name";
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = "Enter a valid email";
-    if (form.phone.trim().length < 10)
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = "Enter a valid email address";
+    const cleanPhone = form.phone.replace(/\D/g, "");
+    if (cleanPhone.length < 10)
       next.phone = "Enter a valid 10-digit phone number";
     if (form.address.trim().length < 5) next.address = "Enter your complete street address";
     if (form.city.trim().length < 2) next.city = "Enter your city";
     if (form.state.trim().length < 2) next.state = "Enter your state";
-    if (form.pincode.trim().length < 4) next.pincode = "Enter a valid postal pincode";
+    const cleanPincode = form.pincode.replace(/\D/g, "");
+    if (cleanPincode.length !== 6) next.pincode = "Enter a valid 6-digit postal pincode";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
 
   async function handleProceedToUpi() {
+    if (submitting) return;
     setNotice(null);
     if (!validate() || !canSubmit) return;
     setSubmitting(true);
@@ -77,7 +80,11 @@ export default function CheckoutPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          customer: form,
+          customer: {
+            ...form,
+            phone: form.phone.replace(/\D/g, "").slice(-10),
+            pincode: form.pincode.replace(/\D/g, ""),
+          },
           items,
         }),
       });
@@ -137,6 +144,8 @@ export default function CheckoutPage() {
     );
   }
 
+  const hasMadeToMeasureItems = items.some((item) => item.isMadeToMeasure);
+
   return (
     <main className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
       <h1 className="font-serif-display text-3xl text-[var(--color-charcoal)]">
@@ -151,13 +160,13 @@ export default function CheckoutPage() {
           }}
           className="flex flex-col gap-5"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-[var(--color-line)] pb-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]">
               Delivery Details
             </p>
-            <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-charcoal)]/70">
+            <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-charcoal)]/80">
               <span className="inline-block h-2 w-2 rounded-full bg-emerald-600" />
-              Direct UPI Payment
+              Direct UPI Payment (8555909550@ybl)
             </span>
           </div>
 
@@ -176,7 +185,7 @@ export default function CheckoutPage() {
               onChange={(v) => update("email", v)}
             />
             <Field
-              label="Phone Number"
+              label="Phone Number (10 digits)"
               type="tel"
               value={form.phone}
               error={errors.phone}
@@ -184,7 +193,7 @@ export default function CheckoutPage() {
             />
           </div>
           <Field
-            label="Delivery Address"
+            label="Delivery Street Address"
             value={form.address}
             error={errors.address}
             onChange={(v) => update("address", v)}
@@ -203,7 +212,7 @@ export default function CheckoutPage() {
               onChange={(v) => update("state", v)}
             />
             <Field
-              label="Pincode"
+              label="Pincode (6 digits)"
               value={form.pincode}
               error={errors.pincode}
               onChange={(v) => update("pincode", v)}
@@ -211,25 +220,37 @@ export default function CheckoutPage() {
           </div>
 
           {notice ? (
-            <p className="text-sm text-[var(--color-maroon)]">
+            <div className="rounded-xs border border-[var(--color-maroon)]/30 bg-[var(--color-maroon)]/5 p-3 text-xs text-[var(--color-maroon)]">
               {notice}
-            </p>
+            </div>
           ) : null}
 
+          {/* Made to Measure Policy Disclosure */}
+          {hasMadeToMeasureItems && (
+            <div className="rounded-xs border border-amber-900/20 bg-amber-50/70 p-4 text-xs text-amber-950">
+              <p className="font-semibold uppercase tracking-[0.08em] text-amber-900">
+                Tailoring &amp; Custom Fit Policy:
+              </p>
+              <p className="mt-1 leading-relaxed text-amber-900/85">
+                Your order includes bespoke made-to-measure pieces crafted to your custom proportions. Each piece is individually cut by our Pochampally artisans. Made-to-measure orders are non-refundable once production begins, except in cases of transit damage or structural defects.
+              </p>
+            </div>
+          )}
+
           {/* Payment Guidance Box */}
-          <div className="mt-2 rounded-sm border border-[var(--color-line)] bg-[var(--color-offwhite)]/80 p-5 text-xs text-[var(--color-charcoal)]">
+          <div className="rounded-xs border border-[var(--color-line)] bg-[var(--color-cotton)]/40 p-5 text-xs text-[var(--color-charcoal)]">
             <p className="font-semibold uppercase tracking-[0.08em] text-[var(--color-charcoal)]">
-              Direct UPI Payment Flow
+              Direct UPI Payment Instructions
             </p>
             <ol className="mt-2.5 list-inside list-decimal space-y-1.5 leading-relaxed text-[var(--color-charcoal)]/80">
               <li>
-                Clicking <strong>Proceed to UPI Payment</strong> will generate your unique order reference.
+                Clicking <strong>Proceed to UPI Payment</strong> will generate your unique order reference and lock in the dynamic total.
               </li>
               <li>
-                You can pay using PhonePe, Google Pay, Paytm, or any compatible UPI app on your phone, or scan the UPI QR code.
+                Pay seamlessly using PhonePe, Google Pay, Paytm, or any UPI app, or scan the generated QR code on desktop.
               </li>
               <li>
-                Once paid, our Pochampally atelier verifies the incoming bank credit and confirms your order.
+                Our Pochampally studio manually compares the incoming bank credit against your order reference before confirming fulfillment.
               </li>
             </ol>
           </div>
@@ -237,9 +258,9 @@ export default function CheckoutPage() {
           <Button
             type="submit"
             disabled={submitting}
-            className="mt-3 w-full sm:w-auto"
+            className="mt-2 w-full sm:w-auto"
           >
-            {submitting ? "Initiating UPI Payment…" : "Proceed to UPI Payment →"}
+            {submitting ? "Securing Order & Opening UPI…" : `Pay ${formatPrice(total)} via UPI →`}
           </Button>
         </form>
 

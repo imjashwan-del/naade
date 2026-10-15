@@ -318,54 +318,108 @@ export default function OrderStatusPage({
             </div>
           ) : (
             <>
-              {/* Primary Mobile Payment Intent Button */}
-              <div className="mt-6 flex flex-col gap-2">
+              {/* Primary Mobile Payment Intent Buttons */}
+              <div className="mt-6 flex flex-col gap-3">
                 <a
-                  href={data.upiIntentUrl || "#"}
+                  href={data.upiIntentUrl || `upi://pay?pa=8555909550%40ybl&pn=NAADE&am=${data.amount.toFixed(2)}&cu=INR&tn=Order%20${data.orderReference}&tr=${data.orderReference}`}
                   onClick={() => setHasTappedPay(true)}
-                  className="inline-flex items-center justify-center rounded-sm bg-[var(--color-charcoal)] px-6 py-4 text-center text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ivory)] transition-colors hover:bg-black"
+                  className="inline-flex items-center justify-center rounded-xs bg-[var(--color-charcoal)] px-6 py-4 text-center text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ivory)] transition-all hover:bg-black hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-charcoal)]"
                 >
-                  Pay with UPI (PhonePe / GPay / Any UPI App) →
+                  Pay {formatPrice(data.amount)} with Any UPI App →
                 </a>
+
+                {/* Specific UPI Apps for mobile quick selection */}
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  <a
+                    href={`phonepe://pay?pa=8555909550%40ybl&pn=NAADE&am=${data.amount.toFixed(2)}&cu=INR&tn=Order%20${data.orderReference}&tr=${data.orderReference}`}
+                    onClick={() => setHasTappedPay(true)}
+                    className="flex flex-col items-center justify-center rounded-xs border border-[var(--color-line)] bg-white p-2.5 text-center text-[11px] font-semibold text-[var(--color-charcoal)] transition-colors hover:border-[var(--color-charcoal)] hover:bg-[var(--color-cotton)]/50"
+                  >
+                    <span className="text-[10px] uppercase tracking-wider text-[var(--color-maroon)]">App</span>
+                    <span>PhonePe</span>
+                  </a>
+                  <a
+                    href={`tez://upi/pay?pa=8555909550%40ybl&pn=NAADE&am=${data.amount.toFixed(2)}&cu=INR&tn=Order%20${data.orderReference}&tr=${data.orderReference}`}
+                    onClick={() => setHasTappedPay(true)}
+                    className="flex flex-col items-center justify-center rounded-xs border border-[var(--color-line)] bg-white p-2.5 text-center text-[11px] font-semibold text-[var(--color-charcoal)] transition-colors hover:border-[var(--color-charcoal)] hover:bg-[var(--color-cotton)]/50"
+                  >
+                    <span className="text-[10px] uppercase tracking-wider text-[var(--color-maroon)]">App</span>
+                    <span>Google Pay</span>
+                  </a>
+                  <a
+                    href={`paytmmp://pay?pa=8555909550%40ybl&pn=NAADE&am=${data.amount.toFixed(2)}&cu=INR&tn=Order%20${data.orderReference}&tr=${data.orderReference}`}
+                    onClick={() => setHasTappedPay(true)}
+                    className="flex flex-col items-center justify-center rounded-xs border border-[var(--color-line)] bg-white p-2.5 text-center text-[11px] font-semibold text-[var(--color-charcoal)] transition-colors hover:border-[var(--color-charcoal)] hover:bg-[var(--color-cotton)]/50"
+                  >
+                    <span className="text-[10px] uppercase tracking-wider text-[var(--color-maroon)]">App</span>
+                    <span>Paytm</span>
+                  </a>
+                </div>
+
                 <p className="text-center text-[11px] text-[var(--color-charcoal)]/60">
-                  Compatible with PhonePe, Google Pay, Paytm, BHIM, and other UPI apps installed on your device.
+                  On mobile, selecting an option directly launches your installed UPI application with amount ₹{data.amount.toFixed(2)} prefilled.
                 </p>
+
+                {/* Desktop Guidance / Fallback Box */}
+                {hasTappedPay && (
+                  <div className="rounded-xs border border-blue-900/20 bg-blue-50/70 p-4 text-xs text-blue-950">
+                    <p className="font-semibold uppercase tracking-[0.08em] text-blue-900">
+                      Payment In Progress:
+                    </p>
+                    <p className="mt-1 leading-relaxed text-blue-900/90">
+                      If your UPI app opened, approve the payment of <strong>{formatPrice(data.amount)}</strong>. If you are on a desktop browser or the app did not launch, please scan the QR code below or copy the UPI ID directly into your app.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* UPI Details Card & QR Code */}
-              <div className="mt-8 grid items-center gap-6 border-t border-[var(--color-line)] pt-6 sm:grid-cols-[1fr_200px]">
+              <div className="mt-8 grid items-center gap-6 border-t border-[var(--color-line)] pt-6 sm:grid-cols-[1fr_220px]">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--color-charcoal)]/70">
-                    Or Pay Manually via VPA / UPI ID:
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--color-charcoal)]/80">
+                    Pay Manually via VPA / UPI ID:
                   </p>
 
                   <div className="mt-3 flex items-center gap-3">
-                    <span className="font-mono text-sm font-semibold text-[var(--color-charcoal)] bg-[var(--color-offwhite)] px-3 py-2 border border-[var(--color-line)]">
-                      {data.upiId}
+                    <span className="font-mono text-sm font-bold text-[var(--color-charcoal)] bg-[var(--color-cotton)]/60 px-3 py-2 border border-[var(--color-line)] select-all rounded-xs">
+                      {data.upiId || "8555909550@ybl"}
                     </span>
                     <button
                       type="button"
-                      onClick={() => handleCopyUpiId(data.upiId!)}
-                      className="border border-[var(--color-charcoal)]/30 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] hover:bg-[var(--color-charcoal)] hover:text-white transition-colors"
+                      onClick={() => handleCopyUpiId(data.upiId || "8555909550@ybl")}
+                      className="rounded-xs border border-[var(--color-charcoal)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] hover:bg-[var(--color-charcoal)] hover:text-white transition-colors"
                     >
                       {copiedUpi ? "✓ Copied!" : "Copy UPI ID"}
                     </button>
                   </div>
 
-                  <dl className="mt-4 grid grid-cols-2 gap-2 text-xs text-[var(--color-charcoal)]/70">
+                  <dl className="mt-4 grid grid-cols-2 gap-2 text-xs text-[var(--color-charcoal)]/80">
                     <div>
                       <dt className="font-medium text-[var(--color-charcoal)]">Payee:</dt>
                       <dd>{data.payeeName || "NAADE"}</dd>
                     </div>
                     <div>
+                      <dt className="font-medium text-[var(--color-charcoal)]">Exact Amount:</dt>
+                      <dd className="font-bold text-[var(--color-maroon)]">{formatPrice(data.amount)}</dd>
+                    </div>
+                    <div>
                       <dt className="font-medium text-[var(--color-charcoal)]">Reference / Note:</dt>
-                      <dd className="font-mono">{data.orderReference}</dd>
+                      <dd className="font-mono text-[11px]">{data.orderReference}</dd>
+                    </div>
+                    <div>
+                      <dt className="font-medium text-[var(--color-charcoal)]">Destination VPA:</dt>
+                      <dd className="font-mono text-[11px]">8555909550@ybl</dd>
                     </div>
                   </dl>
+
+                  <div className="mt-4 rounded-xs border border-[var(--color-line)]/70 bg-[var(--color-cotton)]/20 p-3 text-[11px] text-[var(--color-charcoal)]/70">
+                    <p className="font-medium text-[var(--color-charcoal)]">Desktop Shoppers:</p>
+                    <p className="mt-0.5">Open PhonePe, Google Pay, or Paytm on your smartphone and point your camera at the QR code to complete payment instantly.</p>
+                  </div>
                 </div>
 
                 {qrCodeUrl && (
-                  <div className="flex flex-col items-center justify-center rounded border border-[var(--color-line)] bg-white p-3">
+                  <div className="flex flex-col items-center justify-center rounded-xs border border-[var(--color-line)] bg-white p-4 shadow-xs">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={qrCodeUrl}
@@ -374,8 +428,11 @@ export default function OrderStatusPage({
                       height={180}
                       className="aspect-square"
                     />
-                    <p className="mt-1 text-[10px] uppercase tracking-wider text-[var(--color-charcoal)]/60">
-                      Scan to Pay via PhonePe / UPI
+                    <p className="mt-2 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--color-charcoal)]/70">
+                      Scan to Pay ₹{data.amount.toFixed(2)}
+                    </p>
+                    <p className="text-[9px] text-[var(--color-charcoal)]/50">
+                      via Any UPI App
                     </p>
                   </div>
                 )}

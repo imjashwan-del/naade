@@ -149,6 +149,13 @@ export async function POST(req: NextRequest) {
   const upiConfig = await getUpiConfig();
 
   let upiIntentUrl: string | null = null;
+  let appIntents: {
+    generic: string;
+    phonePe: string;
+    googlePay: string;
+    paytm: string;
+  } | null = null;
+
   if (upiConfig.isConfigured) {
     upiIntentUrl = buildUpiPaymentUri({
       upiId: upiConfig.upiId,
@@ -157,6 +164,12 @@ export async function POST(req: NextRequest) {
       orderReference,
       note: `Order ${orderReference}`,
     });
+    appIntents = {
+      generic: upiIntentUrl,
+      phonePe: `phonepe://pay?${upiIntentUrl.replace(/^upi:\/\/pay\?/, "")}`,
+      googlePay: `tez://upi/pay?${upiIntentUrl.replace(/^upi:\/\/pay\?/, "")}`,
+      paytm: `paytmmp://pay?${upiIntentUrl.replace(/^upi:\/\/pay\?/, "")}`,
+    };
   }
 
   return NextResponse.json(
@@ -164,11 +177,14 @@ export async function POST(req: NextRequest) {
       success: true,
       orderReference,
       amount: total,
+      subtotal,
+      shipping,
       currency: "INR",
       isConfigured: upiConfig.isConfigured,
-      upiId: upiConfig.upiId || null,
+      upiId: upiConfig.upiId || "8555909550@ybl",
       payeeName: upiConfig.payeeName,
       upiIntentUrl,
+      appIntents,
       expiresAt: expiresAt.toISOString(),
     },
     { status: 201 },

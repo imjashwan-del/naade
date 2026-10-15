@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { siteContent } from "@/db/schema";
@@ -16,7 +17,9 @@ const defaults = Object.fromEntries(
   ]),
 ) as Record<SiteContentPageId, SiteContentValues>;
 
-export async function getSiteContent(pageId: SiteContentPageId) {
+export const getSiteContent = cache(async function getSiteContent(
+  pageId: SiteContentPageId,
+) {
   try {
     const [saved] = await db
       .select({ content: siteContent.content })
@@ -29,7 +32,7 @@ export async function getSiteContent(pageId: SiteContentPageId) {
     console.error(`Failed to load site content for ${pageId}:`, error);
     return defaults[pageId];
   }
-}
+});
 
 export async function getAllSiteContent() {
   try {

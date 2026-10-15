@@ -49,22 +49,39 @@ export default function CartPage() {
           ))}
         </div>
 
-        <aside className="h-fit border border-[var(--color-line)] p-6">
-          <div className="flex items-center justify-between text-sm">
-            <span className="uppercase tracking-[0.1em] text-[var(--color-charcoal)]/60">
-              Subtotal
-            </span>
-            <span className="font-medium text-[var(--color-charcoal)]">{formatPrice(subtotal)}</span>
-          </div>
-          <p className="mt-2 text-xs text-[var(--color-charcoal)]/50">
-            Shipping and taxes calculated at checkout.
+        <aside className="h-fit rounded-xs border border-[var(--color-line)] bg-white/70 p-6 shadow-xs">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-charcoal)]">
+            Summary
           </p>
+          <div className="mt-4 flex items-center justify-between text-sm">
+            <span className="uppercase tracking-[0.08em] text-[var(--color-charcoal)]/70">
+              Bag Subtotal
+            </span>
+            <span className="font-semibold text-[var(--color-charcoal)]">{formatPrice(subtotal)}</span>
+          </div>
+          
+          <div className="mt-3 border-t border-[var(--color-line)] pt-3 text-xs text-[var(--color-charcoal)]/70">
+            {subtotal >= 5000 ? (
+              <p className="flex items-center gap-1.5 text-emerald-800 font-medium">
+                <span>✓</span> Complimentary express delivery included.
+              </p>
+            ) : (
+              <p>
+                Add {formatPrice(5000 - subtotal)} more to qualify for complimentary shipping. Standard delivery: ₹199.
+              </p>
+            )}
+          </div>
+
           <Link
             href="/checkout"
-            className="mt-6 flex w-full items-center justify-center bg-[var(--color-charcoal)] px-6 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ivory)] transition-colors hover:bg-black"
+            className="mt-6 flex w-full items-center justify-center rounded-xs bg-[var(--color-charcoal)] px-6 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ivory)] transition-all hover:bg-black hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-charcoal)]"
           >
-            Proceed to Checkout
+            Proceed to Checkout →
           </Link>
+
+          <p className="mt-4 text-center text-[11px] text-[var(--color-charcoal)]/50">
+            Direct UPI (PhonePe, GPay, Paytm) accepted at checkout.
+          </p>
         </aside>
       </div>
     </main>

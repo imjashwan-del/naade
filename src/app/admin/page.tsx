@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { and, asc, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { orders, products } from "@/db/schema";
+import { orders, products, paymentAttempts } from "@/db/schema";
 import { formatDate, formatPrice } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +29,7 @@ export default async function AdminIndexPage() {
   const [
     orderSummaryRows,
     productSummaryRows,
+    pendingPaymentsRows,
     recentOrders,
     weeklyOrders,
     statusRows,
@@ -48,6 +49,12 @@ export default async function AdminIndexPage() {
         lowStock: sql<number>`count(*) filter (where ${products.isActive} and ${products.inventoryQuantity} <= 5)`,
       })
       .from(products),
+    db
+      .select({
+        pendingCount: count(),
+      })
+      .from(paymentAttempts)
+      .where(eq(paymentAttempts.status, "PENDING_VERIFICATION")),
     db.select().from(orders).orderBy(desc(orders.createdAt)).limit(6),
     db
       .select({ createdAt: orders.createdAt, total: orders.total })
@@ -81,6 +88,7 @@ export default async function AdminIndexPage() {
   const openOrders = Number(orderSummary?.openOrders ?? 0);
   const activeProducts = Number(productSummary?.activeProducts ?? 0);
   const lowStockCount = Number(productSummary?.lowStock ?? 0);
+  const pendingPayments = Number(pendingPaymentsRows[0]?.pendingCount ?? 0);
 
   const dailySales = Array.from({ length: 7 }, (_, index) => {
     const date = new Date(weekStart);
@@ -112,10 +120,16 @@ export default async function AdminIndexPage() {
         </div>
         <div className="flex gap-3">
           <Link
+            href="/admin/pending-payments"
+            className="bg-amber-800 text-white px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] hover:bg-amber-900 transition-colors"
+          >
+            Pending Payments ({pendingPayments})
+          </Link>
+          <Link
             href="/admin/orders"
             className="border border-[var(--color-charcoal)]/25 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em]"
           >
-            View orders
+            Confirmed orders
           </Link>
           <Link
             href="/admin/products/new"
@@ -125,6 +139,28 @@ export default async function AdminIndexPage() {
           </Link>
         </div>
       </header>
+
+      {pendingPayments > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-sm border border-amber-900/20 bg-amber-50 p-5 text-amber-950">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse" />
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-900">
+                Action Required: {pendingPayments} Payment {pendingPayments === 1 ? "Attempt" : "Attempts"} Awaiting Verification
+              </p>
+            </div>
+            <p className="mt-1 text-xs text-amber-900/80">
+              Customers have initiated direct UPI checkout or reported transaction references. Verify your bank statement and confirm fulfillment.
+            </p>
+          </div>
+          <Link
+            href="/admin/pending-payments"
+            className="w-fit bg-amber-900 text-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] rounded-xs hover:bg-black transition-colors"
+          >
+            Review Queue →
+          </Link>
+        </div>
+      )}
 
       <section
         aria-label="Store metrics"

@@ -1,11 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
-import { MobileMenu } from "./MobileMenu";
-import { SearchModal } from "./SearchModal";
 import type { SiteContentValues } from "@/lib/site-content";
+
+const SearchModal = dynamic(
+  () => import("./SearchModal").then((mod) => mod.SearchModal),
+  { ssr: false }
+);
+
+const MobileMenu = dynamic(
+  () => import("./MobileMenu").then((mod) => mod.MobileMenu),
+  { ssr: false }
+);
 
 export function Navbar({ content }: { content: SiteContentValues }) {
   const { itemCount, isLoaded } = useCart();
